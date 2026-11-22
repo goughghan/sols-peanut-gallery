@@ -51,6 +51,27 @@ this test boundary.
   correctly. Arbitrary third-party GIFs may therefore need catalog preflight
   or normalization before a stable release.
 
+## Public clean-checkout smoke test
+
+On 2026-11-22, a new shallow clone of the public `main` branch was tested in a
+disposable directory with no private workspace files or retained build state:
+
+- All 41 public Python, contract, security, deployment, and source-boundary
+  tests passed; the two optional ignored-artifact checks skipped as designed.
+- The bridge wheel built from the repository root and installed into a new
+  virtual environment with no runtime dependency.
+- The installed entry point reported version `0.1.0`.
+- The empty example catalog validated successfully.
+- Initial state creation produced an owner-only SQLite database.
+- A live isolated bridge returned HTTP 200 from `/healthz` and rejected an
+  unauthenticated administrator request with HTTP 401.
+- The deployment layout script reported dry-run mode and made no system
+  changes.
+
+GitHub Actions independently builds the bridge wheel and both Android APK
+variants from a separate clean checkout. This smoke test does not replace the
+pending ARMv7/Pi service, tunnel, or complete host-reboot tests.
+
 ## Still pending
 
 - Multi-hour clean-room idle delivery.
