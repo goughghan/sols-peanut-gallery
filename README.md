@@ -1,6 +1,6 @@
 # Sol's Peanut Gallery
 
-[![Contract checks](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml/badge.svg)](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml)
+[![Contract checks](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml/badge.svg?branch=main&event=push)](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml)
 
 Sol's Peanut Gallery is a self-hosted message-and-media display system for
 showing short text, emoji, JPEG, and animated GIF reactions on a paired Android
