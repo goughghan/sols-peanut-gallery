@@ -11,7 +11,7 @@
 
 ## Privacy and secrets
 
-- [ ] Repository history contains no tunnel keys, tokens, pairing state,
+- [x] Initial public repository history contains no tunnel keys, tokens, pairing state,
       signing material, private addresses, unintended personal details, or
       logs.
 - [x] Repository and locally built debug APK contain no private images, GIFs,
@@ -21,7 +21,8 @@
 
 ## Reproducibility
 
-- [ ] A clean checkout builds the bridge and APK using documented commands.
+- [x] A clean GitHub Actions checkout builds the bridge wheel and both Android
+      APK variants using the pinned toolchains.
 - [x] Gradle wrapper version, distribution checksum, Android plugin/tool
       versions, and downloaded dependency checksums are pinned.
 - [x] Automated unit, contract, and integration tests pass locally.
