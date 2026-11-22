@@ -14,7 +14,8 @@ class PrivacyBoundaryTests(unittest.TestCase):
             if not path.is_file():
                 continue
             relative = path.relative_to(ROOT)
-            if any(part in {"build", ".gradle", "__pycache__"} for part in relative.parts):
+            excluded = {".git", ".gradle", ".venv", "__pycache__", "build", "dist", "local-artifacts"}
+            if any(part in excluded or part.endswith(".egg-info") for part in relative.parts):
                 continue
             yield path
 
