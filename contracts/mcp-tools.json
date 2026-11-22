@@ -1,0 +1,48 @@
+{
+  "tools": [
+    {
+      "name": "find_display_items",
+      "description": "Find items in the operator-owned catalog. Returns metadata only and never downloads public internet media.",
+      "annotations": { "readOnlyHint": true, "destructiveHint": false },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "tags": {
+            "type": "array", "maxItems": 8, "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+          },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 }
+        },
+        "anyOf": [{ "required": ["query"] }, { "required": ["tags"] }]
+      }
+    },
+    {
+      "name": "queue_display",
+      "description": "Queue one bounded text, emoji, or operator-catalog reaction. Success means queued, not visibly displayed.",
+      "annotations": { "readOnlyHint": false, "destructiveHint": false },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["request_id"],
+        "properties": {
+          "request_id": { "type": "string", "format": "uuid" },
+          "emoji": { "type": "string", "minLength": 1, "maxLength": 16 },
+          "reaction_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80 },
+          "caption": { "type": "string", "maxLength": 180 },
+          "display_seconds": { "type": "integer", "minimum": 3, "maximum": 30, "default": 8 }
+        },
+        "oneOf": [
+          { "required": ["emoji"], "not": { "required": ["reaction_id"] } },
+          { "required": ["reaction_id"], "not": { "required": ["emoji"] } },
+          {
+            "required": ["caption"],
+            "properties": { "caption": { "type": "string", "minLength": 1, "maxLength": 180 } },
+            "not": { "anyOf": [{ "required": ["emoji"] }, { "required": ["reaction_id"] }] }
+          }
+        ]
+      }
+    }
+  ]
+}

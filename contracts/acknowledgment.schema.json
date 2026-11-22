@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/acknowledgment.schema.json",
+  "title": "Delivery acknowledgment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["delivery_id", "sequence", "outcome", "completed_at"],
+  "properties": {
+    "delivery_id": { "type": "string", "format": "uuid" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "outcome": { "enum": ["displayed", "dismissed", "failed"] },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "error": { "type": "string", "minLength": 1, "maxLength": 180 }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "outcome": { "const": "failed" } }, "required": ["outcome"] },
+      "then": { "required": ["error"] },
+      "else": { "not": { "required": ["error"] } }
+    }
+  ]
+}

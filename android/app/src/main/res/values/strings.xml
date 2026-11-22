@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <string name="app_name">Sol\'s Peanut Gallery</string>
+    <string name="listener_channel">Reaction listener</string>
+    <string name="reaction_channel">Incoming reactions</string>
+    <string name="listener_active">Listener enabled</string>
+    <string name="listener_detail">Waiting for queued reactions</string>
+    <string name="admin_description">Optionally lets the receiver turn this dedicated display off after a reaction.</string>
+    <string name="screen_off_option">Turn the dedicated display off after each reaction</string>
+    <string name="status_pairing">Pairing…</string>
+    <string name="status_paired">Paired. Enable the listener when this device is ready to receive reactions.</string>
+    <string name="status_pair_failed">Pairing failed: %1$s</string>
+    <string name="status_enable_failed">Cannot enable listener: %1$s</string>
+    <string name="status_enabled">Listener enabled. It will resume after reboot or package update.</string>
+    <string name="status_disabled">Listener disabled.</string>
+</resources>

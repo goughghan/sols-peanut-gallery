@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path android:fillColor="#5E35B1" android:pathData="M4,7h40v28h-16v4h8v4h-24v-4h8v-4h-16z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M9,12h30v18h-30z" />
+</vector>

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sol-peanut-gallery-bridge"
+version = "0.1.0"
+description = "Independent, self-hosted reaction delivery bridge"
+readme = "bridge/README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "Will" }]
+dependencies = []
+
+[project.scripts]
+sol-peanut-gallery = "peanut_gallery_bridge.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "bridge/src" }
+
+[tool.setuptools.packages.find]
+where = ["bridge/src"]

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/catalog.schema.json",
+  "title": "Operator reaction catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "entries"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "entries": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/entry" } }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "file_name", "tags", "caption_seeds"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "file_name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+        "tags": {
+          "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 40 }
+        },
+        "caption_seeds": {
+          "type": "array", "maxItems": 20, "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 180 }
+        }
+      }
+    }
+  }
+}

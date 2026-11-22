@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Inactive template. Resolve every @PLACEHOLDER@ during a reviewed install.
+
+[Unit]
+Description=Sol's Peanut Gallery independent bridge
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=sol-peanut-gallery
+Group=sol-peanut-gallery
+WorkingDirectory=/var/lib/sol-peanut-gallery
+ExecStart=@EXECUTABLE@ --config @CONFIG_FILE@ serve
+LoadCredentialEncrypted=transport-token:@ENCRYPTED_CREDENTIAL_FILE@
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/sol-peanut-gallery /var/log/sol-peanut-gallery
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

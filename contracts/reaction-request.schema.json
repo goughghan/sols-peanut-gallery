@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/reaction-request.schema.json",
+  "title": "Reaction request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_id", "payload"],
+  "properties": {
+    "request_id": { "type": "string", "format": "uuid" },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "display_seconds": { "type": "integer", "minimum": 3, "maximum": 30, "default": 8 },
+    "payload": {
+      "oneOf": [
+        { "$ref": "#/$defs/text" },
+        { "$ref": "#/$defs/catalog" }
+      ]
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "text" },
+        "emoji": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "caption": { "type": "string", "maxLength": 180 }
+      },
+      "anyOf": [
+        { "required": ["emoji"] },
+        { "required": ["caption"], "properties": { "caption": { "minLength": 1 } } }
+      ]
+    },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reaction_id"],
+      "properties": {
+        "kind": { "const": "catalog" },
+        "reaction_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80 },
+        "caption": { "type": "string", "maxLength": 180 }
+      }
+    }
+  }
+}

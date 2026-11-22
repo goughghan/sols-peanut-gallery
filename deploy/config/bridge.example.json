@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "listener": {
+    "bind_host": "0.0.0.0",
+    "bind_port": 8765,
+    "require_paired_device": true
+  },
+  "storage": {
+    "state_directory": "/var/lib/sol-peanut-gallery",
+    "catalog_index": "/var/lib/sol-peanut-gallery/catalog/catalog-index.json",
+    "media_directory": "/var/lib/sol-peanut-gallery/catalog/media"
+  },
+  "queue": {
+    "maximum_pending": 100,
+    "retention_hours": 24,
+    "require_unique_request_id": true
+  },
+  "limits": {
+    "maximum_request_bytes": 65536,
+    "maximum_media_bytes": 8388608,
+    "maximum_caption_characters": 180
+  },
+  "security": {
+    "pairing_ttl_seconds": 300,
+    "credential_name": "transport-token"
+  },
+  "logging": {
+    "destination": "journald",
+    "level": "info",
+    "redact_sensitive_values": true
+  }
+}

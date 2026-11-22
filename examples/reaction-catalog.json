@@ -1,0 +1,9 @@
+{
+  "request_id": "22222222-2222-4222-8222-222222222222",
+  "display_seconds": 10,
+  "payload": {
+    "kind": "catalog",
+    "reaction_id": "example-placeholder",
+    "caption": "Operator-provided media would appear here."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/pairing-response.schema.json",
+  "title": "Pairing response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receiver_id", "receiver_token"],
+  "properties": {
+    "receiver_id": { "type": "string", "format": "uuid" },
+    "receiver_token": { "type": "string", "pattern": "^pg_rt_[A-Za-z0-9_-]{32,128}$" }
+  }
+}

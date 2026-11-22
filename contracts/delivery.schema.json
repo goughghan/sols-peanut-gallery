@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/delivery.schema.json",
+  "title": "Receiver delivery",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["delivery_id", "sequence", "request_id", "created_at", "display_seconds", "content"],
+  "properties": {
+    "delivery_id": { "type": "string", "format": "uuid" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "request_id": { "type": "string", "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "display_seconds": { "type": "integer", "minimum": 3, "maximum": 30 },
+    "content": { "oneOf": [{ "$ref": "#/$defs/text" }, { "$ref": "#/$defs/media" }] }
+  },
+  "$defs": {
+    "text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "const": "text" },
+        "emoji": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "caption": { "type": "string", "maxLength": 180 }
+      },
+      "anyOf": [
+        { "required": ["emoji"] },
+        { "required": ["caption"], "properties": { "caption": { "minLength": 1 } } }
+      ]
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "caption", "media_id", "file_name", "mime_type", "bytes", "sha256", "width", "height"],
+      "properties": {
+        "kind": { "const": "media" },
+        "caption": { "type": "string", "maxLength": 180 },
+        "media_id": { "type": "string", "format": "uuid" },
+        "file_name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,127}$" },
+        "mime_type": { "enum": ["image/jpeg", "image/gif"] },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 8388608 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "width": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "frame_count": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "duration_ms": { "type": "integer", "minimum": 0, "maximum": 300000 }
+      }
+    }
+  }
+}

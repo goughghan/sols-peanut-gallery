@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.gradle/
+android/local.properties
+android/**/build/
+dist/
+build/
+*.apk
+*.aab
+*.jks
+*.keystore
+/local-artifacts/
