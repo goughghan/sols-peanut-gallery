@@ -38,6 +38,24 @@ and known compatibility findings.
   immersive landscape display, GIF loop-aware timing, and optional device-admin
   screen-off behavior.
 
+## Assistants and automations
+
+The project is not tied to ChatGPT, OpenAI, or any other model or service. An
+operator can connect ChatGPT, Claude, a local model, Home Assistant, Node-RED,
+monitoring software, or an ordinary script by placing a small trusted adapter
+in front of the bridge's authenticated HTTP API.
+
+[`contracts/mcp-tools.json`](contracts/mcp-tools.json) describes the optional
+assistant-facing tools: `find_display_items` searches operator-owned catalog
+metadata and `queue_display` queues a bounded caption, emoji, or catalog
+reaction. The same bridge endpoints can be used without MCP. The repository
+does not prescribe an assistant provider, tunnel service, hosting machine,
+media library, or trigger policy.
+
+See [the integration guide](docs/INTEGRATIONS.md) for the trust boundary and a
+provider-neutral setup outline. A successful queue response means accepted for
+delivery; it does not by itself prove that the reaction appeared on screen.
+
 ## Media and secret boundary
 
 The repository and base APK contain no private memes, photographs, GIF
@@ -71,6 +89,7 @@ downloaded dependency hashes are pinned in the project.
 - [Build and verification](docs/BUILD.md)
 - [Installation, upgrade, recovery, and removal](docs/OPERATIONS.md)
 - [Security boundary](docs/SECURITY.md)
+- [Assistant and automation integrations](docs/INTEGRATIONS.md)
 - [Dependencies and licenses](docs/DEPENDENCIES.md)
 - [Acceptance matrix](docs/ACCEPTANCE.md)
 - [Controlled testing record](docs/TESTING.md)
