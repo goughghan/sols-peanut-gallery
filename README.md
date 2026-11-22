@@ -22,6 +22,18 @@ matrix on the intended inexpensive Android device remain open. No public APK
 is released yet. See [the testing record](docs/TESTING.md) for the exact scope
 and known compatibility findings.
 
+## Reference hardware
+
+The project's reference bridge host is a Raspberry Pi 2 Model B Rev 1.1 with
+approximately 1 GB of RAM, running 32-bit Raspberry Pi OS (`armv7l`/`armhf`).
+The bridge is intentionally written for Python 3.9+ using only the standard
+library and SQLite at runtime, so its published wheel is architecture-neutral
+and remains suitable for ARMv7 instead of requiring a newer 64-bit Pi.
+
+The clean-room bridge has passed public x86-64 build and runtime smoke tests;
+its complete service, tunnel, and reboot acceptance test on the physical Pi 2
+is still pending and is not claimed as complete.
+
 ## What is implemented
 
 - Short-lived, one-time pairing codes and revocable receiver credentials.

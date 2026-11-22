@@ -4,6 +4,18 @@ This directory contains a reviewed but inactive service layout, credential-free
 configuration example, hardened systemd template, and read-only Pi preflight.
 Nothing here installs, enables, starts, stops, or restarts a live service.
 
+## Reference host
+
+The reference deployment target is a Raspberry Pi 2 Model B Rev 1.1 running
+32-bit Raspberry Pi OS (`armv7l` kernel and Debian `armhf` packages) with
+approximately 1 GB of RAM. The bridge has no third-party Python runtime
+dependency or native extension: it uses Python 3.9+ standard-library HTTP,
+JSON, hashing, SQLite, and filesystem APIs.
+
+The same code can run on newer ARM or x86-64 Linux hosts. The Pi 2 target is a
+compatibility goal, not a requirement for other operators. Physical Pi 2
+service, tunnel-recovery, and complete host-reboot acceptance remain pending.
+
 ## Files
 
 - `bin/pi-preflight.sh` performs a read-only compatibility inventory.
