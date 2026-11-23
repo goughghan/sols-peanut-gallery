@@ -8,6 +8,10 @@ device. A small private bridge accepts authenticated tool calls, preserves
 their order in SQLite, and delivers them at least once until the receiver sends
 a matching completion acknowledgment.
 
+The receiver can also publish a bounded battery heartbeat. An optional desktop
+watcher uses a separate read-only credential to produce a low-battery alert
+without granting queue or administrator access.
+
 ## Project status
 
 This repository is an independent `0.1.0-alpha` clean-room source preview. The
@@ -17,10 +21,12 @@ text, emoji, JPEG, real-world animated GIF, ordered burst, Wi-Fi interruption,
 package-update recovery, phone-reboot recovery, immersive display, and
 automatic screen-off cases.
 
-Long-idle testing, supervised bridge/tunnel/Linux-host recovery, and the full
-matrix on the intended inexpensive Android device remain open. No public APK
-is released yet. See [the testing record](docs/TESTING.md) for the exact scope
-and known compatibility findings.
+The deployed clean-room stack has also passed supervised bridge-child and
+tunnel-child failure recovery, physical Pi network interruption, and a complete
+unattended Pi reboot with a post-recovery delivery. Long-idle testing and the
+full matrix on an additional older Android device remain open. No public APK is
+released yet. See [the testing record](docs/TESTING.md) for the exact scope and
+known compatibility findings.
 
 ## Reference hardware
 
@@ -30,9 +36,9 @@ The bridge is intentionally written for Python 3.9+ using only the standard
 library and SQLite at runtime, so its published wheel is architecture-neutral
 and remains suitable for ARMv7 instead of requiring a newer 64-bit Pi.
 
-The clean-room bridge has passed public x86-64 build and runtime smoke tests;
-its complete service, tunnel, and reboot acceptance test on the physical Pi 2
-is still pending and is not claimed as complete.
+The clean-room bridge has passed public x86-64 build and runtime smoke tests as
+well as service, tunnel, network-interruption, and unattended-reboot acceptance
+tests on the physical Pi 2.
 
 ## What is implemented
 
@@ -49,6 +55,8 @@ is still pending and is not claimed as complete.
 - Android 8.0+ foreground listening, reboot/update recovery, reconnect backoff,
   immersive landscape display, GIF loop-aware timing, and optional device-admin
   screen-off behavior.
+- Optional receiver battery heartbeats and a platform-replaceable desktop
+  low-battery notifier protected by a distinct status-only credential.
 
 ## Assistants and automations
 

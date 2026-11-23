@@ -15,6 +15,8 @@ bridge, receiver, tunnel, or catalog.
 5. Generate a high-entropy administrator token directly into a protected
    operating-system credential workflow. Do not expose it in a terminal
    command argument, environment file, JSON, or log.
+   Generate a different high-entropy status-observer token through the same
+   protected workflow if the optional battery watcher will be used.
 6. Resolve every placeholder in the systemd template, review the resulting
    unit, and only then install it. Service enable/start requires a separate
    deployment approval.
@@ -59,3 +61,18 @@ so the working private receiver is not overwritten. Do not pair through the
 production bridge or tunnel. Exercise every row of `ACCEPTANCE.md` against an
 isolated bridge state directory and deliberately created test media before any
 cutover decision.
+
+## Desktop low-battery notifications
+
+This optional path is independent of message delivery. Review
+`deploy/config/battery-watch.example.json` and the inactive user-service
+template before installation. Place the status-observer token in an owner-only
+file outside the source tree; do not reuse the administrator or receiver token.
+The Linux example uses `notify-send`, while other platforms may supply an
+equivalent command array. The helper does not invoke a shell.
+
+Before enabling it permanently, test with synthetic status payloads, then with
+a non-production receiver. Verify one alert below the threshold, no repeat
+storm, re-arming only after recovery, and silence for charging or stale devices.
+Installing or enabling the user service remains a separate operator-approved
+deployment step.

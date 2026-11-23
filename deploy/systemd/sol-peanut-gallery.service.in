@@ -15,6 +15,7 @@ Group=sol-peanut-gallery
 WorkingDirectory=/var/lib/sol-peanut-gallery
 ExecStart=@EXECUTABLE@ --config @CONFIG_FILE@ serve
 LoadCredentialEncrypted=transport-token:@ENCRYPTED_CREDENTIAL_FILE@
+LoadCredentialEncrypted=status-token:@ENCRYPTED_STATUS_CREDENTIAL_FILE@
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=20

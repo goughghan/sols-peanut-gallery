@@ -4,6 +4,7 @@
 
 - Tunnel or API keys.
 - Pairing and receiver tokens.
+- Status-observer tokens.
 - Android signing keys or passwords.
 - Operator IP addresses, hostnames, logs, or state databases.
 - Private catalogs, media, captions, or family information.
@@ -18,6 +19,8 @@
 - No untrusted redirects or arbitrary remote media URLs in version 1.
 - Idempotent requests and persistent ordered delivery.
 - Least-privilege service accounts and operating-system credential storage.
+- A separate status-observer credential with no message or administration
+  authority.
 - Secret scanning before every public release.
 
 ## Implemented controls
@@ -35,6 +38,9 @@
   lengths, changed hashes, and changed decoded dimensions.
 - Completion acknowledgments must match the delivery ID, sequence, and receiver
   that claimed the oldest unfinished queue item.
+- Battery reports contain only an integer percentage and charging boolean. The
+  bridge supplies the timestamp, and status observers receive no receiver token,
+  queue contents, media, or administrator capability.
 
 The bridge supports plain local HTTP for isolated networks because Android 8
 devices may need it. Bearer credentials are observable on an untrusted LAN;

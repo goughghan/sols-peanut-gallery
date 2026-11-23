@@ -22,7 +22,8 @@
   },
   "security": {
     "pairing_ttl_seconds": 300,
-    "credential_name": "transport-token"
+    "credential_name": "transport-token",
+    "status_credential_name": "status-token"
   },
   "logging": {
     "destination": "journald",

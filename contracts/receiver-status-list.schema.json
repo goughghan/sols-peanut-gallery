@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/contracts/receiver-status-list.schema.json",
+  "title": "Receiver battery status list",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receivers"],
+  "properties": {
+    "receivers": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "receiver_id",
+          "device_label",
+          "battery_percent",
+          "charging",
+          "reported_at"
+        ],
+        "properties": {
+          "receiver_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "device_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "battery_percent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "charging": {
+            "type": "boolean"
+          },
+          "reported_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

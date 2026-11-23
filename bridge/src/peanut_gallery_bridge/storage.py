@@ -82,6 +82,12 @@ class Storage:
                     created_at TEXT NOT NULL,
                     revoked_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS receiver_status (
+                    receiver_id TEXT PRIMARY KEY REFERENCES receivers(receiver_id),
+                    battery_percent INTEGER NOT NULL CHECK(battery_percent BETWEEN 0 AND 100),
+                    charging INTEGER NOT NULL CHECK(charging IN (0, 1)),
+                    reported_at TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS deliveries (
                     sequence INTEGER PRIMARY KEY AUTOINCREMENT,
                     delivery_id TEXT NOT NULL UNIQUE,
@@ -178,6 +184,62 @@ class Storage:
                 "device_label": row["device_label"],
                 "created_at": row["created_at"],
                 "revoked": row["revoked_at"] is not None,
+            }
+            for row in rows
+        ]
+
+    def record_receiver_status(
+        self,
+        receiver_id: str,
+        battery_percent: int,
+        charging: bool,
+        now: datetime | None = None,
+    ) -> dict[str, object]:
+        reported_at = isoformat(now or utc_now())
+        with self._connection(immediate=True) as connection:
+            active = connection.execute(
+                "SELECT 1 FROM receivers WHERE receiver_id = ? AND revoked_at IS NULL",
+                (receiver_id,),
+            ).fetchone()
+            if active is None:
+                raise AuthenticationError("receiver credential is invalid or revoked")
+            connection.execute(
+                """
+                INSERT INTO receiver_status(receiver_id, battery_percent, charging, reported_at)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(receiver_id) DO UPDATE SET
+                    battery_percent = excluded.battery_percent,
+                    charging = excluded.charging,
+                    reported_at = excluded.reported_at
+                """,
+                (receiver_id, battery_percent, int(charging), reported_at),
+            )
+        return {
+            "receiver_id": receiver_id,
+            "battery_percent": battery_percent,
+            "charging": charging,
+            "reported_at": reported_at,
+        }
+
+    def list_receiver_status(self) -> list[dict[str, object]]:
+        with self._connection() as connection:
+            rows = connection.execute(
+                """
+                SELECT r.receiver_id, r.device_label,
+                       s.battery_percent, s.charging, s.reported_at
+                FROM receivers AS r
+                JOIN receiver_status AS s ON s.receiver_id = r.receiver_id
+                WHERE r.revoked_at IS NULL
+                ORDER BY r.created_at, r.receiver_id
+                """
+            ).fetchall()
+        return [
+            {
+                "receiver_id": row["receiver_id"],
+                "device_label": row["device_label"],
+                "battery_percent": row["battery_percent"],
+                "charging": bool(row["charging"]),
+                "reported_at": row["reported_at"],
             }
             for row in rows
         ]

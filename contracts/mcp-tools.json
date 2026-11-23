@@ -3,7 +3,16 @@
     {
       "name": "find_display_items",
       "description": "Find items in the operator-owned catalog. Returns metadata only and never downloads public internet media.",
-      "annotations": { "readOnlyHint": true, "destructiveHint": false },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "idempotentHint": true
+      },
+      "_meta": {
+        "openai/toolInvocation/invoking": "Checking the reaction library…",
+        "openai/toolInvocation/invoked": "Reaction library checked"
+      },
       "inputSchema": {
         "type": "object",
         "additionalProperties": false,
@@ -16,12 +25,50 @@
           "limit": { "type": "integer", "minimum": 1, "maximum": 10, "default": 5 }
         },
         "anyOf": [{ "required": ["query"] }, { "required": ["tags"] }]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["items", "count"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "title", "tags", "caption_seeds"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 80 },
+                "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+                "tags": {
+                  "type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true,
+                  "items": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 40 }
+                },
+                "caption_seeds": {
+                  "type": "array", "maxItems": 20, "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 1, "maxLength": 180 }
+                }
+              }
+            }
+          },
+          "count": { "type": "integer", "minimum": 0, "maximum": 10 }
+        }
       }
     },
     {
       "name": "queue_display",
       "description": "Queue one bounded text, emoji, or operator-catalog reaction. Success means queued, not visibly displayed.",
-      "annotations": { "readOnlyHint": false, "destructiveHint": false },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false,
+        "idempotentHint": true
+      },
+      "_meta": {
+        "openai/toolInvocation/invoking": "Preparing a reaction…",
+        "openai/toolInvocation/invoked": "Reaction queued"
+      },
       "inputSchema": {
         "type": "object",
         "additionalProperties": false,
@@ -42,6 +89,17 @@
             "not": { "anyOf": [{ "required": ["emoji"] }, { "required": ["reaction_id"] }] }
           }
         ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status", "duplicate", "delivery_id", "sequence"],
+        "properties": {
+          "status": { "type": "string", "const": "queued" },
+          "duplicate": { "type": "boolean" },
+          "delivery_id": { "type": "string", "format": "uuid" },
+          "sequence": { "type": "integer", "minimum": 1 }
+        }
       }
     }
   ]

@@ -33,6 +33,8 @@ implementation details from any existing project or prototype.
 - `PG-107` Resume polling after temporary Wi-Fi loss without reopening the app.
 - `PG-108` Retain pairing and the operator's listener-enabled choice across
   ordinary updates and reboots.
+- `PG-109` Optionally report bounded battery percentage and charging state so
+  an operator can receive a low-battery alert without exposing queue authority.
 
 ## Bridge and tunnel integration
 
@@ -46,6 +48,8 @@ implementation details from any existing project or prototype.
   catalog search or selection, and catalog display.
 - `PG-205` Treat a successful tool call as queued delivery, not proof that the
   physical screen displayed the reaction.
+- `PG-206` Protect battery-status reads with a distinct least-privilege
+  credential that cannot queue, pair, revoke, download, or acknowledge.
 
 ## Media and privacy
 

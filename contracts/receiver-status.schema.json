@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sol-peanut-gallery/contracts/receiver-status.schema.json",
+  "title": "Receiver battery status report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["battery_percent", "charging"],
+  "properties": {
+    "battery_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "charging": {
+      "type": "boolean"
+    }
+  }
+}

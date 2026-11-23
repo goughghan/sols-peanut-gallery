@@ -12,6 +12,10 @@
 - Oversized files, incorrect MIME types, redirects, and traversal attempts fail.
 - An empty catalog still permits text and emoji reactions.
 - No test writes credentials or private media into build artifacts.
+- Receiver battery reports reject extra fields and out-of-range percentages.
+- Status-observer credentials cannot perform administrator operations.
+- Low-battery alerts deduplicate, ignore stale reports, and re-arm only after
+  charging or recovery above the hysteresis threshold.
 
 ## Device acceptance tests
 
@@ -22,12 +26,14 @@
 | GIF | Animation loops, caption remains readable, close occurs on boundary | Pass with short and long operator-library controls |
 | Burst of three | All three appear once, in order, without overlap | Pass on TEST3 |
 | Android reboot | Listener resumes without opening the app | Pass on TEST3 |
-| Wi-Fi interruption | Queued reaction arrives after reconnection | Pass on TEST3 |
-| Bridge child failure | Supervisor restores delivery automatically | Pending supervised deployment test |
-| Tunnel failure | Service manager restores bridge and tunnel | Pending supervised deployment test |
-| Linux host reboot | Both components start without manual secret entry | Pending supervised deployment test |
+| Wi-Fi interruption | Queued reaction arrives after reconnection | Pass on TEST3 and deployed clean-room TEST7; one delivery acknowledged after reconnect |
+| Bridge child failure | Supervisor restores delivery automatically | Pass on deployed clean-room Pi service; post-recovery reaction acknowledged |
+| Tunnel failure | Service manager restores bridge and tunnel | Pass on deployed ARMv7 tunnel; MCP reinitialized and reaction acknowledged |
+| Pi network interruption | Bridge and tunnel recover after link restoration without operator action | Pass on deployed Pi; processes survived, tunnel reconnected, and post-recovery reaction was acknowledged |
+| Linux host reboot | Both components start without manual secret entry | Pass on deployed Pi; new boot verified, MCP tunnel recovered, S9+ resumed polling, and reaction acknowledged |
 | Long idle | Reaction arrives after an agreed multi-hour idle period | In progress |
 | Older target phone | Full matrix passes on the intended inexpensive device | Pending target-device arrival |
+| Battery heartbeat | Desktop receives one low-battery alert without delivery authority | Source-only simulation pending physical test |
 
 The sanitized observations behind these status entries are recorded in
 [`TESTING.md`](TESTING.md). A pass on one controlled device does not replace

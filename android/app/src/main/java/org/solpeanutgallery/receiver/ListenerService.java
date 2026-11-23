@@ -11,8 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.os.BatteryManager;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.File;
@@ -31,12 +33,15 @@ public final class ListenerService extends Service {
     private static final String REACTION_CHANNEL = "reactions-quiet-v2";
     private static final int LISTENER_NOTIFICATION = 100;
     private static final int REACTION_NOTIFICATION_BASE = 10_000;
+    private static final long STATUS_INTERVAL_MILLIS = 5L * 60L * 1_000L;
+    private static final long STATUS_RETRY_MILLIS = 60L * 1_000L;
 
     private final ExecutorService loopExecutor = Executors.newSingleThreadExecutor();
     private final ExecutorService completionExecutor = Executors.newSingleThreadExecutor();
     private final AtomicBoolean loopRunning = new AtomicBoolean(false);
     private AppPreferences preferences;
     private PowerManager.WakeLock wakeLock;
+    private long nextStatusAt;
 
     static void start(Context context) {
         Intent intent = new Intent(context, ListenerService.class).setAction(ACTION_START);
@@ -142,6 +147,7 @@ public final class ListenerService extends Service {
             long backoff = 2_000L;
             try {
                 while (preferences.listenerEnabled() && !Thread.currentThread().isInterrupted()) {
+                    maybeReportStatus();
                     long now = System.currentTimeMillis();
                     ActiveDeliveryState active = preferences.activeDelivery();
                     long remaining = active.remaining(now);
@@ -186,6 +192,24 @@ public final class ListenerService extends Service {
                 if (!preferences.listenerEnabled()) stopSelf();
             }
         });
+    }
+
+    private void maybeReportStatus() {
+        long now = SystemClock.elapsedRealtime();
+        if (now < nextStatusAt) return;
+        nextStatusAt = now + STATUS_RETRY_MILLIS;
+        try {
+            BatteryManager battery = (BatteryManager) getSystemService(BATTERY_SERVICE);
+            int percentage = battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+            if (percentage < 0 || percentage > 100) {
+                throw new IllegalStateException("battery percentage is unavailable");
+            }
+            client().reportStatus(percentage, battery.isCharging());
+            nextStatusAt = now + STATUS_INTERVAL_MILLIS;
+        } catch (Exception failure) {
+            Log.w(TAG, "Battery status report will be retried: "
+                    + failure.getClass().getSimpleName());
+        }
     }
 
     private BridgeClient client() throws Exception {

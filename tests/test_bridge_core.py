@@ -82,6 +82,33 @@ class PairingTests(BridgeTestCase):
         with self.assertRaises(AuthenticationError):
             self.storage.authenticate_receiver("pg_rt_" + "x" * 43)
 
+    def test_receiver_reports_bounded_battery_status(self):
+        receiver = self.pair_receiver()
+        recorded = self.core.report_receiver_status(
+            receiver["receiver_token"],
+            {"battery_percent": 18, "charging": False},
+        )
+        self.assertEqual("recorded", recorded["status"])
+        statuses = self.core.receiver_status()["receivers"]
+        self.assertEqual(1, len(statuses))
+        self.assertEqual(18, statuses[0]["battery_percent"])
+        self.assertFalse(statuses[0]["charging"])
+
+        with self.assertRaises(ValidationError):
+            self.core.report_receiver_status(
+                receiver["receiver_token"],
+                {"battery_percent": True, "charging": False},
+            )
+        with self.assertRaises(ValidationError):
+            self.core.report_receiver_status(
+                receiver["receiver_token"],
+                {"battery_percent": 101, "charging": False},
+            )
+
+        receiver_id = self.storage.authenticate_receiver(receiver["receiver_token"])
+        self.storage.revoke_receiver(receiver_id)
+        self.assertEqual([], self.core.receiver_status()["receivers"])
+
 
 class QueueTests(BridgeTestCase):
     def test_duplicate_request_id_returns_original_delivery(self):

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public final class ReactionActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
                 | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_FULLSCREEN
                 | WindowManager.LayoutParams.FLAG_SECURE);
         immersive();
         try {
@@ -93,9 +95,11 @@ public final class ReactionActivity extends Activity {
         root.setPadding(dp(24), dp(18), dp(24), dp(18));
         root.setBackgroundColor(Color.BLACK);
         if ("text".equals(delivery.kind)) {
-            TextView emoji = label(delivery.emoji, 104);
-            root.addView(emoji, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 0, delivery.caption.isEmpty() ? 1f : 0.68f));
+            if (!delivery.emoji.isEmpty()) {
+                TextView emoji = label(delivery.emoji, 104);
+                root.addView(emoji, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, 0, delivery.caption.isEmpty() ? 1f : 0.65f));
+            }
         } else {
             File media = verifiedCacheFile();
             View mediaView;
@@ -116,13 +120,21 @@ public final class ReactionActivity extends Activity {
                 mediaView = image;
             }
             root.addView(mediaView, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 0, delivery.caption.isEmpty() ? 1f : 0.78f));
+                    ViewGroup.LayoutParams.MATCH_PARENT, 0, delivery.caption.isEmpty() ? 1f : 0.70f));
         }
         if (!delivery.caption.isEmpty()) {
             TextView caption = label(delivery.caption, 34);
             caption.setPadding(dp(12), dp(8), dp(12), dp(8));
+            caption.setIncludeFontPadding(false);
+            caption.setMaxLines(4);
+            caption.setLineSpacing(0f, 1.05f);
+            caption.setAutoSizeTextTypeUniformWithConfiguration(
+                    14, 34, 1, TypedValue.COMPLEX_UNIT_SP);
+            float captionWeight = "text".equals(delivery.kind)
+                    ? (delivery.emoji.isEmpty() ? 1f : 0.35f)
+                    : 0.30f;
             root.addView(caption, new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, 0, "text".equals(delivery.kind) ? 0.32f : 0.22f));
+                    ViewGroup.LayoutParams.MATCH_PARENT, 0, captionWeight));
         }
         return root;
     }
@@ -162,11 +174,25 @@ public final class ReactionActivity extends Activity {
     private void immersive() {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LOW_PROFILE
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        immersive();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        immersive();
+        getWindow().getDecorView().post(this::immersive);
     }
 
     @Override

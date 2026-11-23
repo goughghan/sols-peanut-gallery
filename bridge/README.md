@@ -26,7 +26,9 @@ only non-secret paths and listener settings. The bridge requires:
 - a catalog index matching `contracts/catalog.schema.json`;
 - a separate operator-owned media directory; and
 - an administrator transport token supplied by systemd's
-  `LoadCredentialEncrypted` mechanism as `transport-token`.
+  `LoadCredentialEncrypted` mechanism as `transport-token`; and
+- a distinct read-only status token supplied as `status-token` for optional
+  battery monitors.
 
 An empty index is valid:
 
@@ -66,6 +68,8 @@ bridge state.
 | `GET /v1/deliveries/next` | receiver bearer | fetch oldest unfinished delivery |
 | `GET /v1/media/{media_id}` | receiver bearer | fetch verified local media |
 | `POST /v1/deliveries/{id}/ack` | receiver bearer | acknowledge exact completion |
+| `POST /v1/receiver/status` | receiver bearer | record bounded battery status |
+| `GET /v1/status/receivers` | status-observer bearer | read current receiver battery status |
 | `POST /v1/admin/pairing-codes` | administrator bearer | create one-time code remotely |
 | `POST /v1/admin/receivers/{id}/revoke` | administrator bearer | revoke receiver remotely |
 
@@ -76,3 +80,16 @@ response means queued, never visibly displayed.
 Use HTTPS or a reviewed authenticated local transport whenever other devices
 can observe the network. The bridge intentionally does not fetch remote URLs,
 follow redirects, or bundle a tunnel provider.
+
+## Optional desktop battery watcher
+
+`sol-peanut-gallery-battery-watch` polls the status-only endpoint and runs an
+operator-configured notification command when an unplugged receiver crosses a
+low-battery threshold. It ignores stale reports, uses hysteresis before
+re-arming, and persists notification state so service restarts do not create a
+notification storm. See `deploy/config/battery-watch.example.json`.
+
+The watcher reads its token from a private file; the token is never accepted in
+JSON, an environment variable, or a command-line argument. Notification
+commands are executed directly without a shell. The example uses `notify-send`
+for Linux desktops, but the command is replaceable for other operating systems.

@@ -14,6 +14,7 @@ dependencies = []
 
 [project.scripts]
 sol-peanut-gallery = "peanut_gallery_bridge.cli:main"
+sol-peanut-gallery-battery-watch = "peanut_gallery_bridge.battery_watch:main"
 
 [tool.setuptools]
 package-dir = { "" = "bridge/src" }

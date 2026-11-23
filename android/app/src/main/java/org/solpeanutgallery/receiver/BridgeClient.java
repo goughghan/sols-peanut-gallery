@@ -122,6 +122,19 @@ final class BridgeClient {
         if (status != 200) throw new IOException(errorMessage(response, status));
     }
 
+    void reportStatus(int batteryPercent, boolean charging) throws IOException, JSONException {
+        JSONObject body = new JSONObject()
+                .put("battery_percent", batteryPercent)
+                .put("charging", charging);
+        HttpURLConnection connection = open(baseUrl + "/v1/receiver/status", "POST", token);
+        writeJson(connection, body);
+        int status = connection.getResponseCode();
+        JSONObject response = readJson(connection, status == 200);
+        if (status != 200 || !"recorded".equals(response.optString("status"))) {
+            throw new IOException(errorMessage(response, status));
+        }
+    }
+
     private static void verifyDecodedMedia(byte[] data, Delivery delivery) throws IOException {
         int width;
         int height;

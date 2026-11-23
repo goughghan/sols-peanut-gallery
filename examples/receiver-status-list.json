@@ -1,0 +1,11 @@
+{
+  "receivers": [
+    {
+      "receiver_id": "66666666-6666-4666-8666-666666666666",
+      "device_label": "Example display",
+      "battery_percent": 18,
+      "charging": false,
+      "reported_at": "2026-01-01T00:00:00Z"
+    }
+  ]
+}

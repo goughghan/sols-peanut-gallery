@@ -39,13 +39,46 @@ class DeployScaffoldTests(unittest.TestCase):
         for forbidden in ("192.168.", "sk-", "tunnel_", "token\":"):
             self.assertNotIn(forbidden, text)
 
+        watch_path = DEPLOY / "config" / "battery-watch.example.json"
+        watch = json.loads(watch_path.read_text(encoding="utf-8"))
+        self.assertEqual("https", watch["status_url"].split(":", 1)[0])
+        self.assertGreater(watch["recover_percent"], watch["low_percent"])
+        self.assertIsInstance(watch["notification_command"], list)
+        self.assertNotIn("status-token\":", watch_path.read_text(encoding="utf-8").lower())
+
     def test_service_remains_an_unresolved_hardened_template(self):
         unit = (DEPLOY / "systemd" / "sol-peanut-gallery.service.in").read_text(
             encoding="utf-8")
         self.assertIn("ExecStart=@EXECUTABLE@", unit)
         self.assertIn("@ENCRYPTED_CREDENTIAL_FILE@", unit)
+        self.assertIn("@ENCRYPTED_STATUS_CREDENTIAL_FILE@", unit)
         self.assertIn("NoNewPrivileges=true", unit)
         self.assertIn("ProtectSystem=strict", unit)
+
+        watcher = (DEPLOY / "systemd" / "sol-peanut-gallery-battery-watch.service.in").read_text(
+            encoding="utf-8")
+        self.assertIn("ExecStart=@EXECUTABLE@", watcher)
+        self.assertIn("@CONFIG_FILE@", watcher)
+        self.assertNotIn("systemctl enable", watcher)
+
+    def test_tunnel_service_is_separate_hardened_and_credential_backed(self):
+        unit = (DEPLOY / "systemd" / "sol-peanut-gallery-tunnel.service.in").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("@TUNNEL_CLIENT@", unit)
+        self.assertIn("@TUNNEL_ID@", unit)
+        self.assertIn("@ENCRYPTED_CONTROL_PLANE_CREDENTIAL@", unit)
+        self.assertIn("@ENCRYPTED_TRANSPORT_CREDENTIAL@", unit)
+        self.assertIn("LoadCredentialEncrypted=", unit)
+        self.assertIn("--mcp.server-url", unit)
+        self.assertIn("http://127.0.0.1:@BRIDGE_PORT@/mcp", unit)
+        self.assertIn("file:%d/transport-token", unit)
+        self.assertIn("file:%d/CONTROL_PLANE_API_KEY", unit)
+        self.assertIn("Restart=always", unit)
+        self.assertIn("Wants=sol-peanut-gallery.service", unit)
+        self.assertNotIn("Requires=sol-peanut-gallery.service", unit)
+        self.assertIn("NoNewPrivileges=true", unit)
+        self.assertNotIn("WantedBy=default.target", unit)
 
 
 if __name__ == "__main__":

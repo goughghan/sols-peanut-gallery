@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status_url": "https://bridge.example.invalid/v1/status/receivers",
+  "token_file": "~/.config/sol-peanut-gallery/status-token",
+  "state_file": "~/.local/state/sol-peanut-gallery/battery-watch.json",
+  "low_percent": 20,
+  "recover_percent": 25,
+  "stale_after_seconds": 900,
+  "repeat_seconds": 21600,
+  "poll_seconds": 300,
+  "notification_command": [
+    "notify-send",
+    "--app-name=Sol's Peanut Gallery",
+    "--icon=battery-caution",
+    "{title}",
+    "{body}"
+  ]
+}

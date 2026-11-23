@@ -142,6 +142,27 @@ class BridgeCore:
         receiver_id = self.storage.authenticate_receiver(receiver_token)
         return self.storage.next_delivery(receiver_id)
 
+    def report_receiver_status(self, receiver_token: str, body: object) -> dict[str, object]:
+        receiver_id = self.storage.authenticate_receiver(receiver_token)
+        value = self._object(body, {"battery_percent", "charging"})
+        battery_percent = value.get("battery_percent")
+        charging = value.get("charging")
+        if (
+            isinstance(battery_percent, bool)
+            or not isinstance(battery_percent, int)
+            or not 0 <= battery_percent <= 100
+        ):
+            raise ValidationError("battery_percent must be an integer from 0 through 100")
+        if not isinstance(charging, bool):
+            raise ValidationError("charging must be a boolean")
+        status = self.storage.record_receiver_status(
+            receiver_id, battery_percent, charging
+        )
+        return {"status": "recorded", **status}
+
+    def receiver_status(self) -> dict[str, object]:
+        return {"receivers": self.storage.list_receiver_status()}
+
     def acknowledge(self, receiver_token: str, body: object) -> dict[str, object]:
         receiver_id = self.storage.authenticate_receiver(receiver_token)
         value = self._object(body, {"delivery_id", "sequence", "outcome", "completed_at", "error"})

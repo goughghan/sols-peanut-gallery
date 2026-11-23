@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Inactive template. Resolve every @PLACEHOLDER@ during a reviewed install.
+
+[Unit]
+Description=Sol's Peanut Gallery secure MCP tunnel
+Wants=network-online.target
+After=network-online.target sol-peanut-gallery.service
+Wants=sol-peanut-gallery.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=sol-peanut-gallery
+Group=sol-peanut-gallery
+WorkingDirectory=/var/lib/sol-peanut-gallery
+LoadCredentialEncrypted=CONTROL_PLANE_API_KEY:@ENCRYPTED_CONTROL_PLANE_CREDENTIAL@
+LoadCredentialEncrypted=transport-token:@ENCRYPTED_TRANSPORT_CREDENTIAL@
+ExecStart=@TUNNEL_CLIENT@ run \
+  --control-plane.api-key file:%d/CONTROL_PLANE_API_KEY \
+  --control-plane.organization-id @ORGANIZATION_ID@ \
+  --control-plane.tunnel-id @TUNNEL_ID@ \
+  --mcp.server-url url=http://127.0.0.1:@BRIDGE_PORT@/mcp \
+  --mcp.extra-headers "X-Peanut-Gallery-Token: file:%d/transport-token" \
+  --mcp.oauth-discovery disabled \
+  --mcp.startup-wait-timeout 30s \
+  --health.listen-addr 127.0.0.1:@HEALTH_PORT@ \
+  --health.show-details \
+  --log.format json \
+  --log.level info
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/sol-peanut-gallery /var/log/sol-peanut-gallery
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

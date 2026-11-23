@@ -53,6 +53,7 @@ public final class ConfigActivity extends Activity {
         TextView heading = text("Sol's Peanut Gallery receiver", 26);
         heading.setTypeface(Typeface.DEFAULT_BOLD);
         column.addView(heading);
+        column.addView(text("Build " + installedVersion() + " · clean-room protocol v1", 13));
         column.addView(text("Pair this dedicated display with your self-hosted bridge. The app contains no reaction media or server credential.", 16));
 
         url = field("Bridge URL", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
@@ -213,6 +214,13 @@ public final class ConfigActivity extends Activity {
 
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
     private void toast(String value) { Toast.makeText(this, value, Toast.LENGTH_LONG).show(); }
+    private String installedVersion() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (android.content.pm.PackageManager.NameNotFoundException impossible) {
+            return "unknown";
+        }
+    }
     private static String safeMessage(Exception error) {
         String message = error.getMessage();
         return message == null || message.isEmpty() ? error.getClass().getSimpleName() : message;

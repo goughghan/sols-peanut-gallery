@@ -41,6 +41,7 @@ class BridgeConfig:
     maximum_caption_characters: int = 180
     pairing_ttl_seconds: int = 300
     credential_name: str = "transport-token"
+    status_credential_name: str = "status-token"
 
     @property
     def database_path(self) -> Path:
@@ -74,6 +75,13 @@ class BridgeConfig:
         credential_name = security.get("credential_name", "transport-token")
         if not isinstance(credential_name, str) or not credential_name.replace("-", "").isalnum():
             raise ConfigError("security.credential_name is invalid")
+        status_credential_name = security.get("status_credential_name", "status-token")
+        if (
+            not isinstance(status_credential_name, str)
+            or not status_credential_name.replace("-", "").isalnum()
+            or status_credential_name == credential_name
+        ):
+            raise ConfigError("security.status_credential_name is invalid")
         return cls(
             bind_host=host,
             bind_port=_integer(listener.get("bind_port"), "listener.bind_port", 1, 65_535),
@@ -87,13 +95,21 @@ class BridgeConfig:
             maximum_caption_characters=_integer(limits.get("maximum_caption_characters"), "limits.maximum_caption_characters", 1, 180),
             pairing_ttl_seconds=_integer(security.get("pairing_ttl_seconds", 300), "security.pairing_ttl_seconds", 30, 900),
             credential_name=credential_name,
+            status_credential_name=status_credential_name,
         )
 
     def read_admin_token(self) -> str:
+        return self._read_credential(self.credential_name)
+
+    def read_status_token(self) -> str:
+        return self._read_credential(self.status_credential_name)
+
+    @staticmethod
+    def _read_credential(credential_name: str) -> str:
         credentials_directory = os.environ.get("CREDENTIALS_DIRECTORY")
         if not credentials_directory:
             raise ConfigError("CREDENTIALS_DIRECTORY is not set")
-        credential_path = Path(credentials_directory) / self.credential_name
+        credential_path = Path(credentials_directory) / credential_name
         try:
             token = credential_path.read_text(encoding="utf-8").strip()
         except OSError as error:

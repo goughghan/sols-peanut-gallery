@@ -23,10 +23,10 @@ class AndroidSourceTests(unittest.TestCase):
         build = (ROOT / "android" / "app" / "build.gradle").read_text(encoding="utf-8")
         label = (ROOT / "android" / "app" / "src" / "debug" / "res" / "values" / "strings.xml").read_text(
             encoding="utf-8")
-        self.assertIn("versionCode 2", build)
-        self.assertIn('versionNameSuffix "-test3"', build)
+        self.assertIn("versionCode 6", build)
+        self.assertIn('versionNameSuffix "-test7"', build)
         self.assertIn("signingConfig null", build)
-        self.assertIn("Peanut Gallery Test 3", label)
+        self.assertIn("Peanut Gallery Test 7", label)
 
     def test_completion_is_identity_guarded_and_notification_is_per_delivery(self):
         service = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ListenerService.java").read_text(
@@ -56,6 +56,28 @@ class AndroidSourceTests(unittest.TestCase):
         self.assertEqual(1, renderer.count(draw))
         self.assertLess(renderer.index(clear), renderer.index(draw))
 
+    def test_reaction_caption_autosizes_inside_reserved_space(self):
+        activity = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ReactionActivity.java").read_text(
+            encoding="utf-8")
+        self.assertIn("setAutoSizeTextTypeUniformWithConfiguration", activity)
+        self.assertIn("14, 34, 1, TypedValue.COMPLEX_UNIT_SP", activity)
+        self.assertIn("caption.setMaxLines(4)", activity)
+        self.assertIn('delivery.emoji.isEmpty() ? 1f : 0.35f', activity)
+        self.assertIn(': 0.30f;', activity)
+
+    def test_reaction_window_hides_system_bars_before_and_after_wake(self):
+        manifest = (ANDROID / "AndroidManifest.xml").read_text(encoding="utf-8")
+        styles = (ANDROID / "res" / "values" / "styles.xml").read_text(encoding="utf-8")
+        activity = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ReactionActivity.java").read_text(
+            encoding="utf-8")
+        self.assertIn('android:theme="@style/ReactionTheme"', manifest)
+        self.assertIn('name="android:windowDisablePreview">true', styles)
+        self.assertIn('name="android:windowFullscreen">true', styles)
+        self.assertIn("FLAG_FULLSCREEN", activity)
+        self.assertIn("SYSTEM_UI_FLAG_LOW_PROFILE", activity)
+        self.assertIn("protected void onPostResume()", activity)
+        self.assertIn("post(this::immersive)", activity)
+
     def test_receiver_rejects_redirects_and_verifies_download(self):
         client = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "BridgeClient.java").read_text(
             encoding="utf-8")
@@ -63,6 +85,17 @@ class AndroidSourceTests(unittest.TestCase):
         self.assertIn('MessageDigest.getInstance("SHA-256")', client)
         self.assertIn("verifyDecodedMedia(data, delivery)", client)
         self.assertNotIn("setInstanceFollowRedirects(true)", client)
+
+    def test_receiver_reports_battery_without_changing_delivery_polling(self):
+        client = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "BridgeClient.java").read_text(
+            encoding="utf-8")
+        service = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ListenerService.java").read_text(
+            encoding="utf-8")
+        self.assertIn('"/v1/receiver/status"', client)
+        self.assertIn('put("battery_percent", batteryPercent)', client)
+        self.assertIn("STATUS_INTERVAL_MILLIS = 5L * 60L * 1_000L", service)
+        self.assertIn("battery.isCharging()", service)
+        self.assertIn("maybeReportStatus();", service)
 
     def test_base_application_has_no_media_asset_directory(self):
         for directory in (ANDROID / "assets", ANDROID / "res" / "raw"):

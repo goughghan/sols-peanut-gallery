@@ -28,6 +28,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="landscape"
             android:showWhenLocked="true"
+            android:theme="@style/ReactionTheme"
             android:turnScreenOn="true"
             tools:ignore="DiscouragedApi,UnusedAttribute" />
 

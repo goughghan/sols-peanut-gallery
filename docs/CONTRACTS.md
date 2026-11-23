@@ -20,3 +20,8 @@ prevents accepted messages from being silently treated as displayed.
 
 All identifiers and values in `examples/` are inert placeholders. The example
 catalog is empty and contains no media.
+
+`receiver-status.schema.json` bounds the receiver heartbeat to battery
+percentage and charging state. `receiver-status-list.schema.json` defines the
+read-only observer response. These endpoints are not MCP tools and do not grant
+an assistant access to device telemetry.

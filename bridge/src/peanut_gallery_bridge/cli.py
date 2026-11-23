@@ -64,7 +64,15 @@ def main(arguments: list[str] | None = None) -> int:
             print(json.dumps({"status": "revoked", "receiver_id": receiver_id}, separators=(",", ":")))
             return 0
         admin_token = config.read_admin_token()
-        server = BridgeHTTPServer((config.bind_host, config.bind_port), core, catalog, config, admin_token)
+        status_token = config.read_status_token()
+        server = BridgeHTTPServer(
+            (config.bind_host, config.bind_port),
+            core,
+            catalog,
+            config,
+            admin_token,
+            status_token,
+        )
         logging.getLogger(__name__).info("bridge listening on %s:%d", config.bind_host, config.bind_port)
         try:
             server.serve_forever(poll_interval=0.5)

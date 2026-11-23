@@ -14,6 +14,7 @@ from .catalog import Catalog
 from .config import BridgeConfig
 from .core import BridgeCore, ValidationError
 from .media import MediaError, verify_media_bytes
+from .mcp import handle_message
 from .storage import AuthenticationError, ConflictError, StorageError
 
 
@@ -27,12 +28,21 @@ class BridgeHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, address: tuple[str, int], core: BridgeCore, catalog: Catalog, config: BridgeConfig, admin_token: str):
+    def __init__(
+        self,
+        address: tuple[str, int],
+        core: BridgeCore,
+        catalog: Catalog,
+        config: BridgeConfig,
+        admin_token: str,
+        status_token: str,
+    ):
         super().__init__(address, BridgeRequestHandler)
         self.core = core
         self.catalog = catalog
         self.config = config
         self.admin_token = admin_token
+        self.status_token = status_token
 
 
 class BridgeRequestHandler(BaseHTTPRequestHandler):
@@ -55,6 +65,10 @@ class BridgeRequestHandler(BaseHTTPRequestHandler):
                 else:
                     self._send_json(HTTPStatus.OK, delivery)
                 return
+            if self.path == "/v1/status/receivers":
+                self._require_status_observer()
+                self._send_json(HTTPStatus.OK, self.server.core.receiver_status())
+                return
             media_match = MEDIA_PATH.fullmatch(self.path)
             if media_match:
                 self._serve_media(media_match.group(1))
@@ -65,9 +79,24 @@ class BridgeRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802 - required by BaseHTTPRequestHandler
         try:
+            if self.path == "/mcp":
+                self._require_mcp_admin()
+                response = handle_message(self.server.core, self._read_json())
+                if response is None:
+                    self._send_empty(HTTPStatus.ACCEPTED)
+                else:
+                    self._send_json(HTTPStatus.OK, response)
+                return
             if self.path == "/v1/pair":
                 body = self._read_json()
                 self._send_json(HTTPStatus.CREATED, self.server.core.pair(body))
+                return
+            if self.path == "/v1/receiver/status":
+                token = self._bearer_token()
+                self._send_json(
+                    HTTPStatus.OK,
+                    self.server.core.report_receiver_status(token, self._read_json()),
+                )
                 return
             if self.path == "/v1/tools/queue-display":
                 self._require_admin()
@@ -142,6 +171,25 @@ class BridgeRequestHandler(BaseHTTPRequestHandler):
         supplied = self._bearer_token()
         if not hmac.compare_digest(supplied, self.server.admin_token):
             raise AuthenticationError("administrator credential is invalid")
+
+    def _require_mcp_admin(self) -> None:
+        """Authenticate tunnel MCP without constructing a secret command argument."""
+
+        supplied = self.headers.get("X-Peanut-Gallery-Token")
+        if supplied is None:
+            self._require_admin()
+            return
+        if (
+            not 32 <= len(supplied) <= 512
+            or any(character.isspace() for character in supplied)
+            or not hmac.compare_digest(supplied, self.server.admin_token)
+        ):
+            raise AuthenticationError("administrator credential is invalid")
+
+    def _require_status_observer(self) -> None:
+        supplied = self._bearer_token()
+        if not hmac.compare_digest(supplied, self.server.status_token):
+            raise AuthenticationError("status observer credential is invalid")
 
     def _serve_media(self, media_id: str) -> None:
         self.server.core.storage.authenticate_receiver(self._bearer_token())
