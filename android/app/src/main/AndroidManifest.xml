@@ -26,8 +26,10 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTop"
+            android:noHistory="true"
             android:screenOrientation="landscape"
             android:showWhenLocked="true"
+            android:taskAffinity="${applicationId}.reaction"
             android:theme="@style/ReactionTheme"
             android:turnScreenOn="true"
             tools:ignore="DiscouragedApi,UnusedAttribute" />

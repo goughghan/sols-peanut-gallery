@@ -1,6 +1,7 @@
 # Sol's Peanut Gallery
 
 [![Contract checks](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml/badge.svg?branch=main&event=push)](https://github.com/goughghan/sols-peanut-gallery/actions/workflows/contracts.yml)
+[![Latest release](https://img.shields.io/github/v/release/goughghan/sols-peanut-gallery)](https://github.com/goughghan/sols-peanut-gallery/releases/latest)
 
 Sol's Peanut Gallery is a self-hosted message-and-media display system for
 showing short text, emoji, JPEG, and animated GIF reactions on a paired Android
@@ -14,19 +15,37 @@ without granting queue or administrator access.
 
 ## Project status
 
-This repository is an independent `0.1.0-alpha` clean-room source preview. The
+This repository contains the independent `1.0.0` clean-room release. The
 bridge and Android receiver pass their automated build, test, lint, privacy,
-and contract checks. Controlled testing on an Android 10 Galaxy S9+ has passed
-text, emoji, JPEG, real-world animated GIF, ordered burst, Wi-Fi interruption,
-package-update recovery, phone-reboot recovery, immersive display, and
-automatic screen-off cases.
+and contract checks. Controlled testing across a Galaxy S7 on Android 8,
+Galaxy S9+ on Android 10, Onn tablet on Android 16, and Pixel 7 Pro on the
+Android 17 beta has passed text, emoji, JPEG, tall and wide real-world animated
+GIFs, and responsive caption/media scaling. The S9+ additionally passed an
+ordered burst, Wi-Fi interruption, package-update recovery, phone-reboot
+recovery, immersive display, and automatic screen-off cases.
+
+The controlled TEST8 receiver also tightens dark-screen presentation with both
+legacy and current Android system-bar controls, a transition-free isolated
+reaction task, and an immediate re-hide guard. On the Onn tablet this reduced a
+clearly visible wake-time bar flash to, at most, a momentary single-frame
+flicker and prevented the configuration screen from resurfacing after display.
 
 The deployed clean-room stack has also passed supervised bridge-child and
 tunnel-child failure recovery, physical Pi network interruption, and a complete
-unattended Pi reboot with a post-recovery delivery. Long-idle testing and the
-full matrix on an additional older Android device remain open. No public APK is
-released yet. See [the testing record](docs/TESTING.md) for the exact scope and
-known compatibility findings.
+unattended Pi reboot with a post-recovery delivery. A GIF reaction also arrived
+and acknowledged after roughly 18 hours of uninterrupted receiver polling. A
+separately purchased inexpensive dedicated receiver remains useful post-release
+compatibility testing, but is not required for the supported Android 8+ claim.
+See [the testing record](docs/TESTING.md) for the exact scope and known
+compatibility findings.
+
+## Start here
+
+Download the APK, Python wheel, and checksums from the
+[latest GitHub release](https://github.com/goughghan/sols-peanut-gallery/releases/latest),
+then follow the [beginner quick start](docs/QUICKSTART.md). It first proves a
+local Linux-to-Android reaction with no assistant or tunnel, then shows how to
+add private media and optional assistant integrations.
 
 ## Reference hardware
 
@@ -104,6 +123,7 @@ downloaded dependency hashes are pinned in the project.
 
 ## Documentation
 
+- [Beginner quick start](docs/QUICKSTART.md)
 - [Bridge operation](bridge/README.md)
 - [Android receiver](android/README.md)
 - [Build and verification](docs/BUILD.md)
@@ -113,6 +133,7 @@ downloaded dependency hashes are pinned in the project.
 - [Dependencies and licenses](docs/DEPENDENCIES.md)
 - [Acceptance matrix](docs/ACCEPTANCE.md)
 - [Controlled testing record](docs/TESTING.md)
+- [1.0.0 release verification](docs/releases/RELEASE-1.0.0.md)
 - [Clean-room provenance](docs/PROVENANCE.md)
 
 ## Development and AI assistance

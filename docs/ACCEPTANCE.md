@@ -19,11 +19,13 @@
 
 ## Device acceptance tests
 
-| Test | Required result | Current alpha evidence |
+| Test | Required result | Current evidence |
 |---|---|---|
-| Text and emoji | Full reaction appears and closes on schedule | Pass on Android 10 S9+ |
-| JPEG | Correct image and caption appear in landscape | Pass on Android 10 S9+ |
-| GIF | Animation loops, caption remains readable, close occurs on boundary | Pass with short and long operator-library controls |
+| Text and emoji | Full reaction appears and closes on schedule | Pass across Android 8 S7, Android 10 S9+, Android 16 Onn tablet, and Android 17 beta Pixel 7 Pro |
+| JPEG | Correct image and caption appear in landscape | Pass across phone and tablet displays |
+| GIF | Animation loops, caption remains readable, close occurs on boundary | Pass with short, long, tall, and wide operator-library controls across phone and tablet displays |
+| Responsive layout | Text and media scale without clipping on materially different displays | Pass across Android 8, 10, 16, and Android 17 beta phone/tablet displays |
+| Immersive wake | Dark-screen reaction opens full screen and completes normally | Pass; TEST8 reduced the Onn bar flash to at most a momentary single-frame flicker and kept the configuration task closed |
 | Burst of three | All three appear once, in order, without overlap | Pass on TEST3 |
 | Android reboot | Listener resumes without opening the app | Pass on TEST3 |
 | Wi-Fi interruption | Queued reaction arrives after reconnection | Pass on TEST3 and deployed clean-room TEST7; one delivery acknowledged after reconnect |
@@ -31,8 +33,8 @@
 | Tunnel failure | Service manager restores bridge and tunnel | Pass on deployed ARMv7 tunnel; MCP reinitialized and reaction acknowledged |
 | Pi network interruption | Bridge and tunnel recover after link restoration without operator action | Pass on deployed Pi; processes survived, tunnel reconnected, and post-recovery reaction was acknowledged |
 | Linux host reboot | Both components start without manual secret entry | Pass on deployed Pi; new boot verified, MCP tunnel recovered, S9+ resumed polling, and reaction acknowledged |
-| Long idle | Reaction arrives after an agreed multi-hour idle period | In progress |
-| Older target phone | Full matrix passes on the intended inexpensive device | Pending target-device arrival |
+| Long idle | Reaction arrives after an agreed multi-hour idle period | Pass on deployed clean-room TEST7 after roughly 18 hours; acknowledged once with an empty queue afterward |
+| Older Android compatibility | Full matrix passes on an Android 8-era phone | Pass on Galaxy S7; inexpensive dedicated receiver remains post-release compatibility work |
 | Battery heartbeat | Desktop receives one low-battery alert without delivery authority | Source-only simulation pending physical test |
 
 The sanitized observations behind these status entries are recorded in

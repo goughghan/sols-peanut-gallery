@@ -50,6 +50,11 @@ this test boundary.
   canvas clearing. Both representative operator-library GIF classes rendered
   correctly. Arbitrary third-party GIFs may therefore need catalog preflight
   or normalization before a stable release.
+- On the Android 10 S9+ and the Onn tablet, navigation controls were briefly
+  visible while the display woke, then immersive mode hid them. The same flash
+  was not observed on the Galaxy S7. Pixel behavior varied with its launcher
+  and unlock path. In every case the reaction itself displayed and completed
+  normally. This is recorded as a non-blocking Android wake-transition quirk.
 
 ## Deployed clean-room integration
 
@@ -87,8 +92,58 @@ used by these deliveries.
   its MCP session; the S9+ resumed polling. A new normal-chat reaction displayed
   once, acknowledged successfully, and left the durable queue empty. No systemd
   units were failed after the test.
+- After roughly 18 hours of uninterrupted post-reboot polling, a normal-chat GIF
+  reaction reached the S9+, completed its automatic loop timing, acknowledged
+  once, and left the queue empty. This passed the clean-room long-idle delivery
+  gate; the brief wake-time navigation-control flash is recorded separately as
+  a compatibility observation.
 - After both supervised failures, the bridge and tunnel services remained
   active and the receiver continued empty-queue polling.
+
+## Cross-device presentation matrix
+
+On 2026-11-23, the same signed clean-room `0.1.0-test7` receiver was exercised
+on four differently sized Android displays: a Galaxy S7 on Android 8, Galaxy
+S9+ on Android 10, Onn tablet on Android 16, and Pixel 7 Pro on the Android 17
+beta. One listener was enabled at a time; every recorded reaction acknowledged
+once and the durable queue returned to empty before the next device test.
+
+- A Galaxy S7 running Android 8 displayed a long emoji caption, JPEG, short
+  12-frame GIF, and tall 88-frame GIF in landscape. Captions remained readable,
+  media stayed fully visible, animation showed no overlap, and no wake-time
+  navigation-control flash was observed.
+- The Pixel 7 Pro on the Android 17 beta displayed long text, JPEG, and a wide
+  80-frame GIF with correct caption and media scaling. Its locked wake path
+  briefly transitioned from portrait to landscape; under the controlled
+  stock-launcher/no-unlock-gate condition it opened directly in landscape.
+- The Onn tablet on Android 16 displayed a 170-to-180-character emoji caption,
+  JPEG, tall GIF, and wide GIF without clipping or visible animation overlap. The larger
+  display preserved sensible media and text proportions. Dark-screen reactions
+  opened full screen after the required permissions were enabled and optional
+  device administration returned the display to dark. Android briefly exposed
+  the system bars during wake even with the stock launcher, no swipe gate, and
+  the configuration activity removed from Recents.
+- Across all four devices, the responsive layout handled phone and tablet
+  dimensions without a device-specific build or bundled media.
+
+### TEST8 immersive-wake tightening
+
+The signed `0.1.0-test8` package installed in place over TEST7 on the Onn
+tablet with the same controlled-test signing identity and a higher version
+code. Pairing and listener-enabled state survived the update.
+
+TEST8 applies fullscreen flags before `Activity.onCreate`, uses the current
+Android system-bar controller in addition to the legacy immersive flags,
+removes the launch transition, immediately re-hides bars exposed by the system,
+and launches each reaction in a separate disposable task. With gesture
+navigation and window/transition animations disabled on the dedicated tablet,
+two dark-screen emoji reactions opened directly, displayed and acknowledged
+once, returned the screen to dark, and left the configuration screen closed.
+The previously obvious system-bar flash was reduced to no clearly sustained
+appearance; on close observation, the operator reported at most an
+approximately single-frame flicker. This is accepted as a non-blocking
+vendor-controlled wake-transition limit rather than a content or delivery
+failure.
 
 ## Public clean-checkout smoke test
 
@@ -109,13 +164,13 @@ disposable directory with no private workspace files or retained build state:
 
 GitHub Actions independently builds the bridge wheel and both Android APK
 variants from a separate clean checkout. This smoke test does not replace the
-remaining physical-device acceptance matrix.
+remaining intended-target acceptance gate.
 
 ## Still pending
 
-- Multi-hour clean-room idle delivery.
-- The full matrix on the intended inexpensive older Android receiver.
 - A separately signed, verified public release APK.
+- Post-release compatibility confirmation on the separately purchased
+  inexpensive dedicated receiver after it arrives.
 
 These results support an alpha source publication. They do not claim stable
 release readiness or universal Android/GIF compatibility.

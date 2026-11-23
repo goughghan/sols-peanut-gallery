@@ -11,7 +11,7 @@ import uuid
 
 from .catalog import Catalog, CatalogError
 from .config import BridgeConfig, ConfigError
-from .core import BridgeCore
+from .core import BridgeCore, ValidationError
 from .http_api import BridgeHTTPServer
 from .storage import Storage
 
@@ -19,7 +19,7 @@ from .storage import Storage
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(prog="sol-peanut-gallery")
     result.add_argument("--config", required=True, type=Path, help="path to non-secret bridge JSON configuration")
-    result.add_argument("--version", action="version", version="sol-peanut-gallery 0.1.0")
+    result.add_argument("--version", action="version", version="sol-peanut-gallery 1.0.0")
     subcommands = result.add_subparsers(dest="command", required=True)
     subcommands.add_parser("serve", help="run the authenticated bridge HTTP service")
     subcommands.add_parser("validate-catalog", help="validate the configured operator catalog and media")
@@ -27,6 +27,15 @@ def parser() -> argparse.ArgumentParser:
     subcommands.add_parser("receivers", help="list receiver identifiers and revocation state")
     revoke = subcommands.add_parser("revoke-receiver", help="revoke one receiver credential")
     revoke.add_argument("receiver_id", help="receiver UUID shown by the receivers command")
+    queue_local = subcommands.add_parser(
+        "queue-local", help="queue one local smoke-test reaction without exposing a credential")
+    source = queue_local.add_mutually_exclusive_group()
+    source.add_argument("--emoji", help="emoji to display")
+    source.add_argument("--reaction-id", help="operator catalog reaction identifier")
+    queue_local.add_argument("--caption", help="optional caption, or caption-only content")
+    queue_local.add_argument(
+        "--display-seconds", type=int, default=8,
+        help="requested display duration from 3 through 30 seconds (default: 8)")
     return result
 
 
@@ -63,6 +72,20 @@ def main(arguments: list[str] | None = None) -> int:
                 return 3
             print(json.dumps({"status": "revoked", "receiver_id": receiver_id}, separators=(",", ":")))
             return 0
+        if options.command == "queue-local":
+            body: dict[str, object] = {
+                "request_id": str(uuid.uuid4()),
+                "display_seconds": options.display_seconds,
+            }
+            if options.emoji is not None:
+                body["emoji"] = options.emoji
+            if options.reaction_id is not None:
+                body["reaction_id"] = options.reaction_id
+            if options.caption is not None:
+                body["caption"] = options.caption
+            queued, _duplicate = core.queue_display(body)
+            print(json.dumps(queued, separators=(",", ":")))
+            return 0
         admin_token = config.read_admin_token()
         status_token = config.read_status_token()
         server = BridgeHTTPServer(
@@ -81,7 +104,7 @@ def main(arguments: list[str] | None = None) -> int:
         finally:
             server.server_close()
         return 0
-    except (ConfigError, CatalogError, OSError) as error:
+    except (ConfigError, CatalogError, ValidationError, OSError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 

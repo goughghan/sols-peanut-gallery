@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description=Sol's Peanut Gallery bridge
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=sol-peanut-gallery
+Group=sol-peanut-gallery
+WorkingDirectory=/var/lib/sol-peanut-gallery
+ExecStart=/opt/sol-peanut-gallery/current/bin/sol-peanut-gallery --config /etc/sol-peanut-gallery/bridge.json serve
+LoadCredentialEncrypted=transport-token:/etc/credstore.encrypted/sol-peanut-gallery-transport-token.cred
+LoadCredentialEncrypted=status-token:/etc/credstore.encrypted/sol-peanut-gallery-status-token.cred
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/sol-peanut-gallery /var/log/sol-peanut-gallery
+MemoryMax=256M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target

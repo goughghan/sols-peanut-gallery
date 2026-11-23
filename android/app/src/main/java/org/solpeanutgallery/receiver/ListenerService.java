@@ -224,7 +224,10 @@ public final class ListenerService extends Service {
 
     private void showReaction(Delivery delivery, File media) {
         Intent activity = new Intent(this, ReactionActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
         delivery.putInto(activity);
         if (media != null) activity.putExtra("media_path", media.getAbsolutePath());
         int notificationId = reactionNotificationId(delivery.deliveryId);

@@ -1,8 +1,9 @@
 # Linux deployment material
 
-This directory contains a reviewed but inactive service layout, credential-free
-configuration example, hardened systemd template, and read-only Pi preflight.
-Nothing here installs, enables, starts, stops, or restarts a live service.
+This directory contains a dry-run-first installer, reviewed service layout,
+credential-free configuration example, hardened systemd units, and read-only
+Pi preflight. The installer changes a host only with `--apply`; it installs but
+does not enable or start the service.
 
 ## Reference host
 
@@ -14,14 +15,19 @@ JSON, hashing, SQLite, and filesystem APIs.
 
 The same code can run on newer ARM or x86-64 Linux hosts. The Pi 2 target is a
 compatibility goal, not a requirement for other operators. Physical Pi 2
-service, tunnel-recovery, and complete host-reboot acceptance remain pending.
+service, tunnel, network-loss, and complete host-reboot recovery have passed
+with the clean-room bridge.
 
 ## Files
 
 - `bin/pi-preflight.sh` performs a read-only compatibility inventory.
 - `bin/create-layout.sh` prints the proposed service account and directories by
   default; `--apply` changes a host only after separate review and approval.
+- `bin/install-bridge.sh` previews a standard release-wheel installation by
+  default. `--apply` creates a versioned virtual environment, an empty catalog,
+  host-encrypted service credentials, and the inactive systemd unit.
 - `config/bridge.example.json` is bounded non-secret configuration.
+- `systemd/sol-peanut-gallery.service` is the ready standard-layout unit.
 - `systemd/sol-peanut-gallery.service.in` is inactive until every placeholder
   is resolved during a controlled installation.
 
@@ -39,5 +45,5 @@ Its administrator token must be supplied by `LoadCredentialEncrypted`; it must
 not appear in JSON, environment files, command arguments, repository history,
 or logs.
 
-See `docs/OPERATIONS.md` for the controlled install, upgrade, recovery, and
-removal procedure. None of those steps has been run on the live host.
+See `docs/QUICKSTART.md` for the beginner path and `docs/OPERATIONS.md` for the
+controlled upgrade, recovery, and removal procedures.

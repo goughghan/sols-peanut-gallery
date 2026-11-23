@@ -2,7 +2,9 @@
 
 import json
 from pathlib import Path
+import re
 import subprocess
+import tempfile
 import unittest
 
 
@@ -26,9 +28,19 @@ class DeployScaffoldTests(unittest.TestCase):
     def test_scaffold_never_activates_a_service(self):
         for script in sorted((DEPLOY / "bin").glob("*.sh")):
             text = script.read_text(encoding="utf-8")
-            self.assertNotIn("systemctl enable", text)
-            self.assertNotIn("systemctl start", text)
-            self.assertNotIn("systemctl restart", text)
+            self.assertIsNone(re.search(
+                r"(?m)^\s*systemctl\s+(?:enable|start|restart)\b", text))
+
+    def test_release_installer_is_dry_run_first(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            wheel = Path(temporary) / "sol_peanut_gallery_bridge-1.0.0-py3-none-any.whl"
+            wheel.write_bytes(b"dry-run fixture")
+            result = subprocess.run(
+                [str(DEPLOY / "bin" / "install-bridge.sh"), "--dry-run", str(wheel)],
+                check=True, capture_output=True, text=True)
+        self.assertIn("mode=dry-run", result.stdout)
+        self.assertIn("no changes made", result.stdout)
+        self.assertIn("venv-1.0.0", result.stdout)
 
     def test_example_config_is_bounded_and_contains_no_secret(self):
         path = DEPLOY / "config" / "bridge.example.json"
@@ -54,6 +66,14 @@ class DeployScaffoldTests(unittest.TestCase):
         self.assertIn("@ENCRYPTED_STATUS_CREDENTIAL_FILE@", unit)
         self.assertIn("NoNewPrivileges=true", unit)
         self.assertIn("ProtectSystem=strict", unit)
+
+        ready = (DEPLOY / "systemd" / "sol-peanut-gallery.service").read_text(
+            encoding="utf-8")
+        self.assertNotIn("@", ready)
+        self.assertIn("/opt/sol-peanut-gallery/current/bin/sol-peanut-gallery", ready)
+        self.assertIn("LoadCredentialEncrypted=transport-token:", ready)
+        self.assertIn("LoadCredentialEncrypted=status-token:", ready)
+        self.assertNotIn("Environment=", ready)
 
         watcher = (DEPLOY / "systemd" / "sol-peanut-gallery-battery-watch.service.in").read_text(
             encoding="utf-8")

@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Movie;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -18,6 +19,9 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,12 +40,9 @@ public final class ReactionActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle state) {
+        prepareWindowBeforeCreate();
         super.onCreate(state);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_FULLSCREEN
-                | WindowManager.LayoutParams.FLAG_SECURE);
+        disableLaunchTransition();
         immersive();
         try {
             delivery = Delivery.from(getIntent());
@@ -51,6 +52,7 @@ public final class ReactionActivity extends Activity {
                 return true;
             });
             setContentView(content);
+            installImmersiveGuard();
             handler.postDelayed(() -> complete("displayed", null), DisplayTiming.milliseconds(delivery));
             notifyOpened(delivery);
         } catch (Exception failure) {
@@ -61,6 +63,38 @@ public final class ReactionActivity extends Activity {
                 finishAndRemoveTask();
             }
         }
+    }
+
+    private void prepareWindowBeforeCreate() {
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_FULLSCREEN
+                | WindowManager.LayoutParams.FLAG_SECURE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.setNavigationBarContrastEnforced(false);
+            window.setStatusBarContrastEnforced(false);
+        }
+        immersive();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void disableLaunchTransition() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0);
+        } else {
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void installImmersiveGuard() {
+        View decor = getWindow().getDecorView();
+        decor.setOnSystemUiVisibilityChangeListener(visibility -> {
+            int hidden = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+            if ((visibility & hidden) != hidden) decor.post(this::immersive);
+        });
     }
 
     @Override
@@ -171,8 +205,10 @@ public final class ReactionActivity extends Activity {
         if (lock && policy.isAdminActive(admin)) policy.lockNow();
     }
 
+    @SuppressWarnings("deprecation")
     private void immersive() {
-        getWindow().getDecorView().setSystemUiVisibility(
+        Window window = getWindow();
+        window.getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                         | View.SYSTEM_UI_FLAG_LOW_PROFILE
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -180,6 +216,21 @@ public final class ReactionActivity extends Activity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(false);
+            WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                controller.setSystemBarsBehavior(
+                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                controller.hide(WindowInsets.Type.systemBars());
+            }
+        }
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        immersive();
     }
 
     @Override

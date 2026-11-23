@@ -1,31 +1,30 @@
 # Controlled installation and operations
 
-These procedures are prepared for review. They have not been run on a live
-bridge, receiver, tunnel, or catalog.
+The standard installation path is documented in
+[`QUICKSTART.md`](QUICKSTART.md). It installs a versioned environment and a
+ready hardened service without enabling or starting it. The steps below cover
+the operational boundaries after that first installation.
 
 ## Bridge installation
 
-1. Build and test the wheel from a clean checkout as documented in `BUILD.md`.
-2. Review `deploy/bin/create-layout.sh` and explicitly approve its exact target
-   before using `--apply` as root.
-3. Create a versioned virtual environment below `/opt/sol-peanut-gallery/` and
-   install only the verified wheel.
-4. Place non-secret configuration below `/etc/sol-peanut-gallery/`, with state
-   and operator catalog paths below `/var/lib/sol-peanut-gallery/`.
-5. Generate a high-entropy administrator token directly into a protected
-   operating-system credential workflow. Do not expose it in a terminal
-   command argument, environment file, JSON, or log.
-   Generate a different high-entropy status-observer token through the same
-   protected workflow if the optional battery watcher will be used.
-6. Resolve every placeholder in the systemd template, review the resulting
-   unit, and only then install it. Service enable/start requires a separate
-   deployment approval.
-7. Validate the empty catalog, create one one-time pairing code locally, and
-   verify health and authentication before admitting a receiver.
+1. Verify the release wheel with the published `SHA256SUMS`.
+2. Run `deploy/bin/pi-preflight.sh` and review the result.
+3. Run `deploy/bin/install-bridge.sh --dry-run WHEEL` as an ordinary user.
+4. After reviewing its exact paths, run the same installer with `--apply` as
+   root. It creates the unprivileged account, versioned environment, empty
+   catalog, host-encrypted transport/status credentials, and ready service.
+5. Review `/etc/sol-peanut-gallery/bridge.json` and the installed service.
+6. Enable and start the service only as a separate deliberate step, then check
+   `/healthz` from the Android device before creating a pairing code.
+
+The installer preserves an existing configuration and encrypted credentials.
+It refuses to overwrite an existing environment for the same version and does
+not enable or start the bridge automatically.
 
 Use HTTPS or a separately reviewed protected local transport if the network is
 not physically and administratively trusted. Tunnel software is an external
 component and should have its own least-privilege unit and encrypted credential.
+Never forward the bridge's plain-HTTP port through a router.
 
 ## Upgrade
 

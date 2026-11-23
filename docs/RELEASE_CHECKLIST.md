@@ -17,7 +17,7 @@
 - [x] Repository and locally built debug APK contain no private images, GIFs,
       captions, or catalog.
 - [x] Example identifiers and credentials are visibly inert.
-- [ ] Secret scanning passes against the full history and release artifacts.
+- [x] Secret scanning passes against the full history and release artifacts.
 
 ## Reproducibility
 
@@ -26,9 +26,10 @@
 - [x] Gradle wrapper version, distribution checksum, Android plugin/tool
       versions, and downloaded dependency checksums are pinned.
 - [x] Automated unit, contract, and integration tests pass locally.
-- [ ] APK contents, package identity, version, signature, and checksum are
-      verified independently.
-- [ ] Published source corresponds exactly to the release artifact.
+- [x] APK contents, package identity, version, signature, and checksum are
+      verified independently after release signing.
+- [x] The tagged source contains the exact receiver and bridge source used for
+      the signed release artifacts.
 
 ## Device and service acceptance
 
@@ -37,9 +38,11 @@
 - [x] Burst delivery appears once and in order on TEST3.
 - [x] Android reboot and package-update listener recovery pass on TEST3.
 - [x] Wi-Fi interruption and queued recovery pass on TEST3.
-- [ ] Bridge child, tunnel process, and Linux host restart recovery pass.
-- [ ] Multi-hour idle delivery passes.
-- [ ] Intended older Android device passes the full matrix.
+- [x] Bridge child, tunnel process, network link, and Linux host restart
+      recovery pass on the physical Raspberry Pi 2.
+- [x] Multi-hour idle delivery passes after roughly 18 hours.
+- [x] Android 8 older-device compatibility passes on a Galaxy S7.
+- [x] Cross-device layout passes on Android 8, 10, 16, and Android 17 beta.
 
 ## Public presentation
 
@@ -47,24 +50,31 @@
       its primary label.
 - [x] AI-development disclosure is visible.
 - [x] Independent-project disclaimer and acknowledgment are visible.
-- [ ] Installation, recovery, upgrade, removal, and security instructions are
-      complete.
-- [ ] Public APK is media-free and usable with an operator-supplied catalog.
+- [x] Beginner installation plus recovery, upgrade, removal, and security
+      instructions are complete.
+- [x] Public APK is verified media-free and usable with an operator-supplied
+      catalog after release signing.
 
-## Local verification record — 2026-11-22
+## Local verification record — 2026-11-23
 
 - Python contract, bridge, HTTP integration, media, deployment, build-pinning,
-  frozen-baseline, Android-source, license, and privacy suite: 41 tests passed.
-- Android debug and minified unsigned release variants compiled from a clean
-  build; ten timing and active-delivery tests passed in both variants; debug
-  and release lint reported no issues.
-- The bridge wheel built, installed into an isolated virtual environment, and
-  its console entry point reported version `0.1.0`.
-- The pre-freeze debug and unsigned release APKs each contained eight entries
-  and no bundled media. The frozen sacrificial build is recorded separately in
-  `docs/baselines/CONTROLLED-TEST-BASELINE-20261122.md`.
-- Controlled S9+ evidence now covers media display, burst ordering,
-  package-update recovery, Wi-Fi recovery, Android reboot recovery, silent
-  full-screen launch, and automatic screen-off. It does not satisfy
-  supervised service/tunnel/host restart, long-idle, intended target-device,
-  final release-key, clean-public-history, or independent second-system gates.
+  frozen-baseline, Android-source, license, CLI, and privacy suite: 59 tests
+  passed.
+- Android debug and minified release variants compiled from a clean build; ten
+  timing and active-delivery tests passed in each variant; debug and release
+  lint reported no issues.
+- The bridge wheel reports version `1.0.0`; its metadata declares Python 3.9+
+  and an architecture-neutral `py3-none-any` build.
+- The signed public APK verifies with Android signature schemes v2 and v3. It
+  contains eleven entries, all code/resources/signature metadata, and no
+  operator media or credential. Package/version/SDK metadata and release hashes
+  were read back independently.
+- Full Git history and current-tree scans found no private key, common API-token,
+  private-address, private-media, signing-material, or credential pattern. The
+  deliberate forbidden-value literals in privacy tests were reviewed as test
+  data.
+- The installer dry-run resolved only the expected versioned standard paths
+  and made no host change.
+- Physical evidence covers Android 8, 10, 16, and the Android 17 beta, plus Pi
+  service/tunnel/link/reboot recovery and roughly 18-hour idle delivery. Exact
+  device results and the remaining wake-transition quirk are in `TESTING.md`.

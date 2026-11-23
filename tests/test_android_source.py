@@ -23,10 +23,11 @@ class AndroidSourceTests(unittest.TestCase):
         build = (ROOT / "android" / "app" / "build.gradle").read_text(encoding="utf-8")
         label = (ROOT / "android" / "app" / "src" / "debug" / "res" / "values" / "strings.xml").read_text(
             encoding="utf-8")
-        self.assertIn("versionCode 6", build)
-        self.assertIn('versionNameSuffix "-test7"', build)
+        self.assertIn("versionCode 10000", build)
+        self.assertIn('versionName "1.0.0"', build)
+        self.assertIn('versionNameSuffix "-dev"', build)
         self.assertIn("signingConfig null", build)
-        self.assertIn("Peanut Gallery Test 7", label)
+        self.assertIn("Peanut Gallery Development", label)
 
     def test_completion_is_identity_guarded_and_notification_is_per_delivery(self):
         service = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ListenerService.java").read_text(
@@ -71,12 +72,30 @@ class AndroidSourceTests(unittest.TestCase):
         activity = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ReactionActivity.java").read_text(
             encoding="utf-8")
         self.assertIn('android:theme="@style/ReactionTheme"', manifest)
+        self.assertIn('android:taskAffinity="${applicationId}.reaction"', manifest)
+        self.assertIn('android:noHistory="true"', manifest)
         self.assertIn('name="android:windowDisablePreview">true', styles)
         self.assertIn('name="android:windowFullscreen">true', styles)
         self.assertIn("FLAG_FULLSCREEN", activity)
         self.assertIn("SYSTEM_UI_FLAG_LOW_PROFILE", activity)
+        self.assertIn("prepareWindowBeforeCreate();", activity)
+        self.assertLess(activity.index("prepareWindowBeforeCreate();"), activity.index("super.onCreate(state);"))
+        self.assertIn("WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE", activity)
+        self.assertIn("controller.hide(WindowInsets.Type.systemBars())", activity)
+        self.assertIn("setOnSystemUiVisibilityChangeListener", activity)
+        self.assertIn("overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)", activity)
         self.assertIn("protected void onPostResume()", activity)
         self.assertIn("post(this::immersive)", activity)
+
+    def test_reaction_launch_uses_an_isolated_disposable_task(self):
+        manifest = (ANDROID / "AndroidManifest.xml").read_text(encoding="utf-8")
+        service = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ListenerService.java").read_text(
+            encoding="utf-8")
+        self.assertIn('android:taskAffinity="${applicationId}.reaction"', manifest)
+        self.assertIn('android:noHistory="true"', manifest)
+        self.assertIn("Intent.FLAG_ACTIVITY_CLEAR_TASK", service)
+        self.assertIn("Intent.FLAG_ACTIVITY_NO_ANIMATION", service)
+        self.assertIn("finishAndRemoveTask();", (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ReactionActivity.java").read_text(encoding="utf-8"))
 
     def test_receiver_rejects_redirects_and_verifies_download(self):
         client = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "BridgeClient.java").read_text(

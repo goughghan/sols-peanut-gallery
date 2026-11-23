@@ -22,7 +22,7 @@ SUPPORTED_PROTOCOL_VERSIONS = {
     LATEST_PROTOCOL_VERSION,
 }
 
-SERVER_INFO = {"name": "sols-peanut-gallery", "version": "0.1.0"}
+SERVER_INFO = {"name": "sols-peanut-gallery", "version": "1.0.0"}
 SERVER_INSTRUCTIONS = (
     "Use find_display_items to search the operator-owned local catalog. "
     "Use queue_display to queue one reaction. A successful queue operation "

@@ -10,7 +10,7 @@ From the repository root:
 
 ```text
 python -m pip wheel --no-deps --wheel-dir dist .
-python -m pip install dist/sol_peanut_gallery_bridge-0.1.0-py3-none-any.whl
+python -m pip install dist/sol_peanut_gallery_bridge-1.0.0-py3-none-any.whl
 ```
 
 For a disposable development environment, create a virtual environment and
@@ -49,6 +49,7 @@ sol-peanut-gallery --config /path/to/bridge.json validate-catalog
 sol-peanut-gallery --config /path/to/bridge.json pairing-code
 sol-peanut-gallery --config /path/to/bridge.json receivers
 sol-peanut-gallery --config /path/to/bridge.json revoke-receiver RECEIVER_UUID
+sol-peanut-gallery --config /path/to/bridge.json queue-local --emoji "🥜" --caption "It works."
 sol-peanut-gallery --config /path/to/bridge.json serve
 ```
 
@@ -56,6 +57,12 @@ The pairing command prints a six-digit code and expiry, never a long-term
 credential. The Android app exchanges it directly with the bridge. Receiver
 tokens are shown only to the receiver once and stored as SHA-256 digests in
 bridge state.
+
+`queue-local` is a host-local smoke-test path. It uses the same validation,
+ordering, persistence, and catalog checks as authenticated integrations but
+does not require an administrator token on the command line. Run it only as
+the dedicated service account or another account already authorized to access
+the private bridge state.
 
 ## HTTP surface
 
