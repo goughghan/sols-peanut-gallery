@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.DisplayCutout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,12 @@ public final class ReactionActivity extends Activity {
             window.setNavigationBarContrastEnforced(false);
             window.setStatusBarContrastEnforced(false);
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            WindowManager.LayoutParams attributes = window.getAttributes();
+            attributes.layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(attributes);
+        }
         immersive();
     }
 
@@ -128,6 +135,7 @@ public final class ReactionActivity extends Activity {
         root.setGravity(Gravity.CENTER);
         root.setPadding(dp(24), dp(18), dp(24), dp(18));
         root.setBackgroundColor(Color.BLACK);
+        installBalancedCutoutPadding(root);
         if ("text".equals(delivery.kind)) {
             if (!delivery.emoji.isEmpty()) {
                 TextView emoji = label(delivery.emoji, 104);
@@ -171,6 +179,27 @@ public final class ReactionActivity extends Activity {
                     ViewGroup.LayoutParams.MATCH_PARENT, 0, captionWeight));
         }
         return root;
+    }
+
+    private void installBalancedCutoutPadding(View root) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return;
+        int horizontal = dp(24);
+        int vertical = dp(18);
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            DisplayCutout cutout = insets.getDisplayCutout();
+            if (cutout == null) {
+                view.setPadding(horizontal, vertical, horizontal, vertical);
+                return insets;
+            }
+            int side = BalancedCutoutPadding.maximum(
+                    cutout.getSafeInsetLeft(), cutout.getSafeInsetRight());
+            int end = BalancedCutoutPadding.maximum(
+                    cutout.getSafeInsetTop(), cutout.getSafeInsetBottom());
+            view.setPadding(horizontal + side, vertical + end,
+                    horizontal + side, vertical + end);
+            return insets;
+        });
+        root.requestApplyInsets();
     }
 
     private File verifiedCacheFile() throws IOException {

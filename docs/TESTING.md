@@ -126,6 +126,41 @@ once and the durable queue returned to empty before the next device test.
 - Across all four devices, the responsive layout handled phone and tablet
   dimensions without a device-specific build or bundled media.
 
+## Dedicated mini-phone acceptance and 1.0.1 cutout repair
+
+On 2026-11-24, the signed public 1.0.0 receiver was installed on an XS19Pro
+mini phone running Android 12/API 31. The device reports an 854x384 display,
+3 GB RAM, 32 GB storage, and a 32-bit ARMv7 userspace. Pairing, foreground
+polling, authenticated delivery, completion acknowledgment, and optional
+device-administrator screen-off all worked.
+
+The first text and JPEG reactions were centered within Android's asymmetric
+landscape cutout-safe region, which made them appear visibly right of the
+physical display center. The 1.0.1 candidate enables short-edge cutout layout
+and mirrors the larger cutout inset onto both sides. The signed candidate
+installed in place with the public release identity and preserved pairing and
+listener state.
+
+Physical retesting then passed:
+
+- centered emoji and caption;
+- centered JPEG and readable caption;
+- centered animated GIF with smooth playback and readable caption;
+- one-time Android full-screen tutorial dismissal;
+- a direct black-screen to reaction transition after the device's Swipe lock
+  screen was changed to None; and
+- completion acknowledgment followed by automatic return to a dark display.
+
+The mini phone was then fully rebooted. Without opening the receiver app, its
+foreground listener resumed automatically and separately claimed, displayed,
+and acknowledged an emoji/caption reaction, a JPEG/caption reaction, and an
+animated GIF/caption reaction. All three were visibly confirmed; the GIF was
+centered and readable, and the display returned to black afterward. Every
+recorded post-reboot completion had outcome `displayed` with no error.
+
+Disabling Google Play Protect was not required for runtime behavior; it affects
+installation scanning rather than reaction presentation.
+
 ### TEST8 immersive-wake tightening
 
 The signed `0.1.0-test8` package installed in place over TEST7 on the Onn
@@ -163,14 +198,12 @@ disposable directory with no private workspace files or retained build state:
   changes.
 
 GitHub Actions independently builds the bridge wheel and both Android APK
-variants from a separate clean checkout. This smoke test does not replace the
-remaining intended-target acceptance gate.
+variants from a separate clean checkout. The later physical device and release
+evidence below complements that clean-checkout result.
 
-## Still pending
+## Release status
 
-- A separately signed, verified public release APK.
-- Post-release compatibility confirmation on the separately purchased
-  inexpensive dedicated receiver after it arrives.
-
-These results support an alpha source publication. They do not claim stable
-release readiness or universal Android/GIF compatibility.
+The separately signed public APK and the inexpensive dedicated receiver gate
+have both passed. These results support the public release while retaining the
+documented vendor-specific wake-transition and arbitrary-GIF compatibility
+limits; they do not claim universal behavior on every Android build or GIF.

@@ -15,12 +15,13 @@ without granting queue or administrator access.
 
 ## Project status
 
-This repository contains the independent `1.0.0` clean-room release. The
+This repository contains the independent `1.0.1` clean-room release. The
 bridge and Android receiver pass their automated build, test, lint, privacy,
 and contract checks. Controlled testing across a Galaxy S7 on Android 8,
-Galaxy S9+ on Android 10, Onn tablet on Android 16, and Pixel 7 Pro on the
-Android 17 beta has passed text, emoji, JPEG, tall and wide real-world animated
-GIFs, and responsive caption/media scaling. The S9+ additionally passed an
+Galaxy S9+ on Android 10, XS19Pro mini phone on Android 12, Onn tablet on
+Android 16, and Pixel 7 Pro on the Android 17 beta has passed text, emoji,
+JPEG, tall and wide real-world animated GIFs, and responsive caption/media
+scaling. The S9+ additionally passed an
 ordered burst, Wi-Fi interruption, package-update recovery, phone-reboot
 recovery, immersive display, and automatic screen-off cases.
 
@@ -33,9 +34,10 @@ flicker and prevented the configuration screen from resurfacing after display.
 The deployed clean-room stack has also passed supervised bridge-child and
 tunnel-child failure recovery, physical Pi network interruption, and a complete
 unattended Pi reboot with a post-recovery delivery. A GIF reaction also arrived
-and acknowledged after roughly 18 hours of uninterrupted receiver polling. A
-separately purchased inexpensive dedicated receiver remains useful post-release
-compatibility testing, but is not required for the supported Android 8+ claim.
+and acknowledged after roughly 18 hours of uninterrupted receiver polling. The
+inexpensive 854x384 dedicated receiver passed centered text, JPEG, and GIF
+presentation after 1.0.1 added balanced display-cutout handling. It also passed
+automatic listener recovery after a full reboot without opening the app.
 See [the testing record](docs/TESTING.md) for the exact scope and known
 compatibility findings.
 
@@ -140,6 +142,7 @@ downloaded dependency hashes are pinned in the project.
 - [Dependencies and licenses](docs/DEPENDENCIES.md)
 - [Acceptance matrix](docs/ACCEPTANCE.md)
 - [Controlled testing record](docs/TESTING.md)
+- [1.0.1 release verification](docs/releases/RELEASE-1.0.1.md)
 - [1.0.0 release verification](docs/releases/RELEASE-1.0.0.md)
 - [Clean-room provenance](docs/PROVENANCE.md)
 

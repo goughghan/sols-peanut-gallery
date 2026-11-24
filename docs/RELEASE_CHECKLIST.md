@@ -42,7 +42,10 @@
       recovery pass on the physical Raspberry Pi 2.
 - [x] Multi-hour idle delivery passes after roughly 18 hours.
 - [x] Android 8 older-device compatibility passes on a Galaxy S7.
-- [x] Cross-device layout passes on Android 8, 10, 16, and Android 17 beta.
+- [x] Cross-device layout passes on Android 8, 10, 12, 16, and Android 17 beta.
+- [x] The 854x384 dedicated mini receiver passes balanced cutout centering,
+      automatic update-state retention, no-open reboot recovery, and dark-screen
+      text, JPEG, and GIF delivery.
 
 ## Public presentation
 
@@ -75,6 +78,24 @@
   data.
 - The installer dry-run resolved only the expected versioned standard paths
   and made no host change.
-- Physical evidence covers Android 8, 10, 16, and the Android 17 beta, plus Pi
+- Physical evidence covers Android 8, 10, 12, 16, and the Android 17 beta, plus Pi
   service/tunnel/link/reboot recovery and roughly 18-hour idle delivery. Exact
   device results and the remaining wake-transition quirk are in `TESTING.md`.
+
+## 1.0.1 patch verification — 2026-11-24
+
+- The Python contract, bridge, HTTP integration, media, deployment,
+  build-pinning, Android-source, license, CLI, and privacy suite passes all 60
+  tests.
+- Debug and minified release Android variants build cleanly. Each variant
+  passes 13 unit tests, including asymmetric-cutout padding, and both lint
+  variants report no issues.
+- The signed 1.0.1 APK verifies with signature schemes v2 and v3 and the same
+  release certificate as 1.0.0. It has version code 10001, contains eleven
+  code/resource/signature entries, and contains no media or credential.
+- Physical 1.0.1 acceptance on the Android 12 XS19Pro covers centered emoji,
+  JPEG, and animated GIF presentation, readable captions, acknowledgment, and
+  automatic screen-off at 854x384.
+- After a full XS19Pro reboot, the listener resumed without opening the app and
+  separately delivered and acknowledged text, JPEG, and GIF reactions before
+  returning the display to black.

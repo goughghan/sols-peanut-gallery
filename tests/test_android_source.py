@@ -23,8 +23,8 @@ class AndroidSourceTests(unittest.TestCase):
         build = (ROOT / "android" / "app" / "build.gradle").read_text(encoding="utf-8")
         label = (ROOT / "android" / "app" / "src" / "debug" / "res" / "values" / "strings.xml").read_text(
             encoding="utf-8")
-        self.assertIn("versionCode 10000", build)
-        self.assertIn('versionName "1.0.0"', build)
+        self.assertIn("versionCode 10001", build)
+        self.assertIn('versionName "1.0.1"', build)
         self.assertIn('versionNameSuffix "-dev"', build)
         self.assertIn("signingConfig null", build)
         self.assertIn("Peanut Gallery Development", label)
@@ -86,6 +86,13 @@ class AndroidSourceTests(unittest.TestCase):
         self.assertIn("overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)", activity)
         self.assertIn("protected void onPostResume()", activity)
         self.assertIn("post(this::immersive)", activity)
+
+    def test_reaction_window_balances_asymmetric_display_cutouts(self):
+        activity = (ANDROID / "java" / "org" / "solpeanutgallery" / "receiver" / "ReactionActivity.java").read_text(
+            encoding="utf-8")
+        self.assertIn("LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES", activity)
+        self.assertIn("insets.getDisplayCutout()", activity)
+        self.assertIn("BalancedCutoutPadding.maximum", activity)
 
     def test_reaction_launch_uses_an_isolated_disposable_task(self):
         manifest = (ANDROID / "AndroidManifest.xml").read_text(encoding="utf-8")

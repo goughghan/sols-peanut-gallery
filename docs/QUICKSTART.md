@@ -34,7 +34,7 @@ it is not a substitute for source review or malware scanning.
 If Android SDK Build Tools are available, verify the APK signature directly:
 
 ```text
-apksigner verify --verbose --print-certs SolPeanutGallery-1.0.0.apk
+apksigner verify --verbose --print-certs SolPeanutGallery-1.0.1.apk
 ```
 
 The release must verify with APK Signature Schemes v2 and v3. Its signer
@@ -91,7 +91,7 @@ your router or directly to the public internet.
 
 ## 3. Install and pair Android
 
-Copy `SolPeanutGallery-1.0.0.apk` to the Android device and open it. Android may
+Copy `SolPeanutGallery-1.0.1.apk` to the Android device and open it. Android may
 ask you to permit installation from the file manager you used; grant that only
 for this installation, then turn it back off if desired.
 

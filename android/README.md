@@ -50,9 +50,15 @@ SHA-256, and decoded dimensions before it enters the private cache. The
 immersive activity acknowledges only after the requested display interval,
 explicit dismissal, or a bounded failure.
 
+On devices with a camera cutout along a landscape edge, the reaction window
+uses the full short edge and mirrors the larger cutout safe inset onto both
+sides. This keeps content centered on the physical display while protecting it
+from the cutout.
+
 GIF timing is loop-aware: at least four loops for short GIFs, at least twelve
 seconds when captioned, a preferred loop-boundary close, and a thirty-second
 ceiling. A long press explicitly dismisses a visible reaction.
 
-No APK has been installed on a physical device from this clean-room tree yet;
-the device acceptance matrix remains a release gate.
+Signed clean-room builds have passed physical acceptance on Android 8, 10, 12,
+16, and an Android 17 beta across mini phones, full-size phones, and a tablet.
+See `docs/TESTING.md` for the exact scope and vendor-specific wake behavior.
