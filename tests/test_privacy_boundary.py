@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from pathlib import Path
+import hashlib
 import re
 import unittest
 
@@ -41,15 +42,24 @@ class PrivacyBoundaryTests(unittest.TestCase):
                 self.assertIsNone(private_ipv4.search(text))
                 self.assertFalse(any(value in text for value in forbidden_inventory))
 
-    def test_no_media_or_signing_material_is_committed(self):
+    def test_no_unapproved_media_or_signing_material_is_committed(self):
         forbidden_suffixes = {
             ".gif", ".jpg", ".jpeg", ".png", ".webp", ".mp4", ".jks", ".keystore", ".p12", ".pem", ".key"
+        }
+        approved_documentation_media = {
+            Path("docs/images/app-setup-1.0.0.png"):
+                "46ea04253552369002911c31fa82340692e1340788f56d573d6b41a558a6dbc1",
         }
         found = [
             str(path.relative_to(ROOT)) for path in self.source_files()
             if path.suffix.lower() in forbidden_suffixes
+            and path.relative_to(ROOT) not in approved_documentation_media
         ]
         self.assertEqual([], found)
+        for relative, expected_hash in approved_documentation_media.items():
+            path = ROOT / relative
+            self.assertTrue(path.is_file())
+            self.assertEqual(expected_hash, hashlib.sha256(path.read_bytes()).hexdigest())
 
     def test_executable_sources_have_gpl_identifiers(self):
         executable_suffixes = {".py", ".java", ".sh", ".gradle"}

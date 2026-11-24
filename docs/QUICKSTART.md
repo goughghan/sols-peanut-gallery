@@ -27,6 +27,26 @@ sha256sum --check SHA256SUMS
 
 Every listed file must report `OK`. Stop if a hash fails.
 
+Before sideloading, scan the APK with a security tool you trust and investigate
+any alert. The checksum proves that your download matches the published file;
+it is not a substitute for source review or malware scanning.
+
+If Android SDK Build Tools are available, verify the APK signature directly:
+
+```text
+apksigner verify --verbose --print-certs SolPeanutGallery-1.0.0.apk
+```
+
+The release must verify with APK Signature Schemes v2 and v3. Its signer
+certificate SHA-256 fingerprint is:
+
+```text
+3c888c4e480bee019fb2904a03da9f86e6ac479e790353c85adf5852cd2f6e99
+```
+
+Stop if the signature fails or the fingerprint differs. The matching public
+certificate is also supplied as a release asset.
+
 ## 2. Prepare the Linux host
 
 Install the small set of operating-system prerequisites. On Raspberry Pi OS,

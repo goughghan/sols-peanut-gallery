@@ -47,6 +47,13 @@ then follow the [beginner quick start](docs/QUICKSTART.md). It first proves a
 local Linux-to-Android reaction with no assistant or tunnel, then shows how to
 add private media and optional assistant integrations.
 
+## Android receiver
+
+<img src="docs/images/app-setup-1.0.0.png" alt="Unpaired Sol's Peanut Gallery 1.0.0 Android receiver setup screen" width="360">
+
+The base receiver starts unpaired and contains no bridge address, credential,
+or reaction media. Operators supply their own self-hosted bridge and catalog.
+
 ## Reference hardware
 
 The project's reference bridge host is a Raspberry Pi 2 Model B Rev 1.1 with
